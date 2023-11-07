@@ -1,0 +1,38 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    },
+    {
+      "name": "Configuration secret",
+      "key": "secret",
+      "desc": "Secret portion of the update URL for your account.",
+      "value": "secret",
+      "genString": 12
+    }
+  ],
+  "services": [
+    {
+      "id": "60dd9a833c81575b0d55ec86",
+      "name": "Queclink HTTP Configuration Updates ({{.prefix}})",
+      "key": "{{.prefix}}_queclink-http",
+      "modelId": "81da3cb1d06f8a8fbbcbefad",
+      "params": {
+        "webhook": "{{.secret}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "60dd9b9e3c81575b0d55ec87",
+      "name": "Handle Queclink configuration updates ({{.prefix}})",
+      "type": "script",
+      "def": "//var deviceId = event.data.pathSegments[1].substring(0,event.data.pathSegments[1].length-4)\r\n\r\nvar cfg = \"AT+GTFVR=gl500m,GL501_Default,0001,0000000000A000000000000000410008A,00000004,00000000,00000000,,00000000,,,,20210805230258,FFFF$\\\r\nAT+GTSRI=gl500m,4,1,1,76.65.37.111,10000,,0,,0,1,1,120,1,,FFFF$\\\r\nAT+GTGEO=gl500m,2,3,-75.635359,45.448755,50,,,,,,,,,,FFFF$\\\r\nAT+GTDOG=gl500m,1,,7,0200,,1,,0,,,,FFFF$\\\r\nAT+GTHRM=gl500m,,,6F,FF6F,FF6F,F76F,6F,,,,,FFFF$\\\r\nAT+GTNMD=gl500m,1,7,3,3,2,360,2,,,,,,,,FFFF$\\\r\nAT+GTTEM=gl500m,1,0,0,0,60,300,0,,,,,FFFF$\\\r\nAT+GTCFG=gl500m,gl500m,GL500M,,0FFF,003F,1,2,11111111111111,1,1200,0,6,24,1,1,5,0,0000,0,0,10,2,00000000,0,2,FFFF$\"\r\n\r\ntrigger.reply({body:cfg, status:200})",
+      "filterServiceId": "60dd9a833c81575b0d55ec86",
+      "filterType": "http-get"
+    }
+  ]
+}

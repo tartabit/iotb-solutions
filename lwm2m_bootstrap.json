@@ -1,0 +1,29 @@
+{
+  "triggers": [
+    {
+      "id": "615f080caff438443bf81039",
+      "name": "LWM2M Bootstrap to Leshan with DTLS",
+      "type": "script",
+      "def": "var bootstrap = {\r\n    clearSecurityObjects: true,\r\n    clearServerObjects: true,\r\n    clearAclObjects: true,\r\n    servers: [\r\n        {\r\n            shortServerId: 101,\r\n            serverUri: 'coaps://leshan.eclipseprojects.io:5684',\r\n            //secMode: 'nosec',\r\n            secMode: 'psk',\r\n            identityString: 'client',\r\n            pskHex: '22334455667788990011',\r\n            lifetime: 60,\r\n            disableTimeout: 86400,\r\n            binding: 'UQ',\r\n        }\r\n    ]\r\n}\r\ntrigger.reply(bootstrap)",
+      "filterType": "lwm2m-bootstrap"
+    },
+    {
+      "id": "6168579385d02583c5bb6f62",
+      "name": "LWM2M Bootstrap to IOTB",
+      "type": "script",
+      "def": "var bootstrap = {\r\n    clearSecurityObjects: true,\r\n    clearServerObjects: true,\r\n    clearAclObjects: true,\r\n    servers: [\r\n        {\r\n            shortServerId: 99,\r\n            self: true,\r\n            //secMode: 'nosec',\r\n            secMode: 'psk',\r\n            lifetime: 60,\r\n            disableTimeout: 86400,\r\n            binding: 'UQ',\r\n        }\r\n    ]\r\n}\r\ntrigger.reply(bootstrap)",
+      "filterType": "lwm2m-bootstrap"
+    },
+    {
+      "id": "615dc94aaff438443bf81038",
+      "name": "LWM2M Bootstrap to IOTB & Leshan",
+      "type": "script",
+      "def": "var bootstrap = {\r\n    clearSecurityObjects: true,\r\n    clearServerObjects: true,\r\n    clearAclObjects: true,\r\n    servers: [\r\n        {\r\n            shortServerId: 99,\r\n            self: true, // sets serverUri, and auto-generates identity/PSK\r\n            secMode: 'psk',\r\n            lifetime: 60,\r\n            disableTimeout: 86400,\r\n            defaultMinPeriod: 10,\r\n            defaultMaxPeriod: 30,\r\n            binding: 'UQ',\r\n\r\n        },\r\n        {\r\n            shortServerId: 101,\r\n            serverUri: 'coap://leshan.eclipseprojects.io:5683',\r\n            secMode: 'nosec',\r\n            lifetime: 60,\r\n            disableTimeout: 86400,\r\n            defaultMinPeriod: 10,\r\n            defaultMaxPeriod: 30,\r\n            binding: 'UQ',\r\n        }\r\n    ]/*,\r\n    acls: [\r\n        { \r\n            objectId: 4, \r\n            instanceId: 0, \r\n            rules: {\r\n                '99': 'r',\r\n                '101': 'rwedc' \r\n            },\r\n            owner: 65535\r\n        }\r\n    ]*/\r\n}\r\ntrigger.reply(bootstrap)",
+      "filterType": "lwm2m-bootstrap"
+    }
+  ],
+  "doNotStartTriggers": [
+    "615f080caff438443bf81039",
+    "615dc94aaff438443bf81038"
+  ]
+}

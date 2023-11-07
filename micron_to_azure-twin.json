@@ -1,0 +1,79 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    },
+    {
+      "name": "Azure Digital Twin hostname",
+      "key": "hostname",
+      "desc": "Enter the hostname for your ADT instance.",
+      "value": "***.digitaltwins.net"
+    },
+    {
+      "name": "Service Principal Tenant",
+      "key": "tenant",
+      "desc": "Tenant of your service principal."
+    },
+    {
+      "name": "Service Principal Client ID",
+      "key": "client_id",
+      "desc": "Client ID of your service principal."
+    },
+    {
+      "name": "Service Principal Secret Key",
+      "key": "secret_key",
+      "desc": "Secret Key of your service principal."
+    },
+    {
+      "name": "Event Hub Connection String (optional)",
+      "key": "eventhub_conn_string",
+      "desc": "Event Hub is used for receiving changes in real-time."
+    },
+    {
+      "name": "Event Hub Consumer Group (optional)",
+      "key": "eventhub_consumer_group",
+      "desc": "Consumer group for your event hub."
+    }
+  ],
+  "services": [
+    {
+      "id": "6203fd10ec6a2b6be72d9c56",
+      "name": "Micron - Azure Digital Twins ({{.prefix}})",
+      "key": "{{.prefix}}-digital-twin",
+      "modelId": "818cd858a6c151216d15383d",
+      "params": {
+        "client_id": "{{.client_id}}",
+        "eventhub_conn_string": "{{.eventhub_conn_string}}",
+        "eventhub_consumer_group": "{{.eventhub_consumer_group}}",
+        "hostname": "{{.hostname}}",
+        "secret_key": "{{.secret_key}}",
+        "tenant": "{{.tenant}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "620405308a7211aaf44d2f24",
+      "name": "Digital Twin - On Change",
+      "type": "script",
+      "def": "\r\ntrigger.include('Micron - Commands')\r\n\r\nevent.data.changes.forEach( function(change) {\r\n  if(change && change.path) {\r\n    var cmd = ''\r\n    if(change.path === '/properties/command') {\r\n      // entire command added\r\n      cmd = change.value.string\r\n    } else if(change.path === '/properties/command/string') {\r\n      cmd = change.value\r\n    }\r\n\r\n    if(!cmd || cmd.length===0) return // no command or blank\r\n\r\n    if( change.op==='add' || change.op==='replace' ) {\r\n      var rsp = send_command(event.data.id, cmd, true)\r\n      if(rsp.success) {\r\n        azure_twin.update('{{.prefix}}-digital-twin',event.data.id,[{op: 'replace', path: '/properties/commandReply/string', value: 'success'}])\r\n      } else {\r\n        azure_twin.update('{{.prefix}}-digital-twin',event.data.id,[{op: 'replace', path: '/properties/commandReply/string', value: rsp.error}])\r\n      }\r\n    }\r\n  }\r\n})\r\n",
+      "filterType": "azure-twin-changed"
+    },
+    {
+      "id": "6203fe088a7211aaf44d2f23",
+      "name": "Digital Twin - Send",
+      "type": "script",
+      "def": "var model = {\r\n  event: {string: event.data.data.event},\r\n  state: {string: 'normal'}\r\n}\r\n\r\nif(event.data.data.gps) {\r\n    model.gnss = {location: {\r\n      lat: event.data.data.gps.latitude,\r\n      lon: event.data.data.gps.longitude\r\n    }}\r\n    model.heading = {double: event.data.data.gps.heading}\r\n    model.speed = {double: event.data.data.gps.speed}\r\n}\r\nif(event.data.data.battery) {\r\n    model.battery = {double: event.data.data.battery}\r\n}\r\nif(event.data.data.motion) {\r\n    model.motion = {boolean: event.data.data.motion}\r\n} else {\r\n    model.motion = {boolean: false}\r\n}\r\nmodel.command = {string: ''}\r\nmodel.commandReply = {string: ''}\r\n\r\nazure_twin.add('{{.prefix}}-digital-twin',event.data.data.key,'dtmi:com:tartabit:generic;1', {type: 'micron-ata', properties: model})\r\nazure_twin.send('{{.prefix}}-digital-twin',event.data.data.key,{telemetry: model})\r\n\r\nazure_twin.add_relationship('{{.prefix}}-digital-twin','type-micron',event.data.data.key, event.data.data.key, 'rel_has_generics', {desc: 'added: '+event.ts})\r\n\r\nif(event.data.data.geofenceName) {\r\n  if(event.data.data.event=='geofence-enter') {\r\n    azure_twin.add_relationship('{{.prefix}}-digital-twin','geofence-'+event.data.data.geofenceName,event.data.data.key, event.data.data.key, 'rel_has_generics', {desc: 'entered: '+event.ts})\r\n  } else if(event.data.data.event=='geofence-leave') {\r\n    azure_twin.delete_relationship('{{.prefix}}-digital-twin','geofence-'+event.data.data.geofenceName,event.data.data.key)\r\n  }\r\n}\r\n",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "micron-data"
+        }
+      }
+    }
+  ]
+}

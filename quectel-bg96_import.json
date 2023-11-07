@@ -1,0 +1,29 @@
+{
+  "templateDef": [
+    {
+      "name": "Device IMEI",
+      "key": "imei",
+      "desc": "The IMEI for your Quectel module.",
+      "value": "<imei>"
+    },
+    {
+      "name": "LWM2M Service",
+      "key": "service",
+      "desc": "Select a previously defined LWM2M service.",
+      "findService": "8162da7fee748d33d09ab7c1"
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "5f638853b75c5a1231988082",
+      "serviceId": "{{.service}}",
+      "name": "Quectel BG96 - {{.imei}}",
+      "key": "{{.imei}}",
+      "params": {
+        "endpoint": "urn:imei:{{ .imei}}",
+        "identity": "urn:imei:{{ .imei}}",
+        "psk": "{{xQuectelPsk .imei}}"
+      }
+    }
+  ]
+}

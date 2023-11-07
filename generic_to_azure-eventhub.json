@@ -1,0 +1,38 @@
+{
+  "templateDef": [
+    {
+      "name": "Azure connection string",
+      "key": "conn_string",
+      "desc": "Enter the connection string for a policy with 'send' rights.",
+      "value": "Endpoint=sb://.../;SharedAccessKeyName=SenderPolicy;SharedAccessKey=...=;EntityPath=..."
+    }
+  ],
+  "services": [
+    {
+      "id": "5f71fa2170e9994276bbd737",
+      "name": "Azure Event Hub",
+      "key": "azure_eventhub",
+      "modelId": "81751171229a47314f36d2c5",
+      "params": {
+        "connection_string": "{{.conn_string}}",
+        "operations": "send"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "5f71fb4870e9994276bbd738",
+      "name": "Send to Event Hub",
+      "version": 3,
+      "type": "script",
+      "def": "var data = event.data.data\ndata.name = event.endpoint.name\ndata.key = event.endpoint.key\n\neventhub.send('azure_eventhub', data);",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "data"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    },
+    {
+      "name": "Device IMEI/Name",
+      "key": "device",
+      "desc": "The IMEI/name for your Queclink device.",
+      "value": "<imei/name>"
+    },
+    {
+      "name": "Webhook URL",
+      "key": "url",
+      "desc": "Enter the URL where Queclink device reports should be sent as POST messages.",
+      "value": "https://<myurl.com>/webhook/secret"
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "6092be73282d561a133ea5f7",
+      "serviceId": "6092bd08943d9e84f1ce5aca",
+      "name": "{{ .device }}",
+      "key": "{{ .device }}"
+    }
+  ],
+  "services": [
+    {
+      "id": "6102bd87a6eb43be10800268",
+      "name": "Webhook Sender",
+      "key": "{{.prefix}}_webhook_sender",
+      "modelId": "81da3cb1d06f8a8fbbcbefad",
+      "params": {
+        "endpoint_key_type": "none"
+      }
+    },
+    {
+      "id": "6092bd08943d9e84f1ce5aca",
+      "name": "Queclink Connector",
+      "key": "{{.prefix}}_queclink",
+      "modelId": "817e139902a320822f8709d7"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "6092bed1943d9e84f1ce5acc",
+      "name": "Queclink report to HTTP(S) Webhook ({{.prefix}})",
+      "type": "script",
+      "def": "http.post('{{.prefix}}_webhook_sender', '{{.url}}', event.data.report);",
+      "filterServiceId": "6092bd08943d9e84f1ce5aca",
+      "filterType": "queclink-report"
+    }
+  ]
+}

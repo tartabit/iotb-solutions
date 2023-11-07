@@ -1,0 +1,51 @@
+{
+  "templateDef": [
+    {
+      "name": "Azure IoT Central ID Scope",
+      "key": "dps_id_scope",
+      "desc": "Enter the ID Scope for your IoT Central application.",
+      "value": "0nexxxxxxx"
+    },
+    {
+      "name": "Azure IoT Central Access Key",
+      "key": "dps_access_key",
+      "desc": "Enter the primary or secondary shared access key for group enrollment."
+    },
+    {
+      "name": "Activity timeout",
+      "key": "activity_timeout",
+      "desc": "If there is no activity, close the Azure device connection after this timeout.",
+      "value": "600"
+    }
+  ],
+  "services": [
+    {
+      "id": "5f5b9e49dfb509446ef1b73f",
+      "name": "Azure IoT Hub",
+      "key": "azure_iothub",
+      "modelId": "811382a6ea7fb1f40f682af3",
+      "params": {
+        "activity_timeout": "{{.activity_timeout}}",
+        "authentication": "DPS",
+        "dps_id_scope": "{{.dps_id_scope}}",
+        "dps_access_key": "{{.dps_access_key}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "5f5b9e4adfb509446ef1b742",
+      "name": "Send to Azure IoT",
+      "version": 2,
+      "type": "script",
+      "def": "azure_iot.send('azure_iothub', event.endpoint.key, event.data.data);\nazure_iot.twin_update('azure_iothub', event.endpoint.key, {name: event.endpoint.name});",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "data"
+        }
+      }
+    }
+  ]
+}

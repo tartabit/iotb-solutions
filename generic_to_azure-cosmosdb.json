@@ -1,0 +1,50 @@
+{
+  "templateDef": [
+    {
+      "name": "Azure connection string",
+      "key": "conn_string",
+      "desc": "Enter the connection string for the cosmosdb database.",
+      "value": "AccountEndpoint=https://***:443/;AccountKey=***;"
+    },
+    {
+      "name": "Database name",
+      "key": "dbname",
+      "desc": "Name of the database.",
+      "value": "demo"
+    },
+    {
+      "name": "Collection name",
+      "key": "collname",
+      "desc": "Name of the collection to write to.",
+      "value": "demo"
+    }
+  ],
+  "services": [
+    {
+      "id": "5f6a3db948f4487a3262defd",
+      "name": "Azure CosmosDB",
+      "key": "azure_cosmosdb",
+      "modelId": "81eb4ef4caf315195557826b",
+      "params": {
+        "connection_string": "{{.conn_string}}",
+        "database": "{{.dbname}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "5f6a3ee048f4487a3262defe",
+      "name": "Send to CosmosDB",
+      "version": 11,
+      "type": "script",
+      "def": "var data = event.data.data\ndata.name = event.endpoint.name\ndata.key = event.endpoint.key\n\ncosmosdb.create('azure_cosmosdb', '{{.collname}}', event.endpoint.key, data);",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "data"
+        }
+      }
+    }
+  ]
+}

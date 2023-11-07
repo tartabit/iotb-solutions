@@ -1,0 +1,129 @@
+{
+  "templateDef": [
+    {
+      "name": "Version resource",
+      "key": "version_resource",
+      "desc": "The LWM2M resource containing the firmware version.",
+      "value": "3/0/3"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "6264c985b90debc6c75cb07a",
+      "name": "LWM2M - FOTA - Initiate",
+      "type": "script",
+      "def": "// This trigger enqueues FOTA operations using the lwm2m.firmwareUpdate() function.\r\n// There are many ways to programatically initiate a FOTA operation, but this way allows you to initiate an \r\n// operation on one or more devices either by providing the endpoint keys or search criteria.\r\n\r\n// initiate updates based on a list of keys provided in the generic data.\r\n// {\r\n//   \"keys\": [\"swarm00000000\",\"swarm00000019\", \"swarm00000018\"],\r\n//   \"uri\": \"http://localhost?ver=3.5.1\"\r\n// }\r\nif(event.data.data.keys) {\r\n    event.data.data.keys.forEach( function(key) {\r\n        var values = {}\r\n        values.result_ts = event.ts\r\n        values.result = 'in-progress'\r\n\r\n        report.publish('lwm2m-firmware',key,event.ts,{values:values})\r\n        lwm2m.firmwareUpdate(key,event.data.data.uri)\r\n    })\r\n}\r\n\r\n// initiate updates based on a search for endpoints that match the given criteria.  You can provide any search string you want, or build the query dynamically depending on what makes sense.\r\n// {\r\n//   \"search\": {\r\n//     \"connected\": true,\r\n//     \"tags\": {\"version\":\"1.1.0\"}\r\n//   },\r\n//   \"uri\": \"http://localhost?ver=3.5.1\"\r\n// }\r\nif(event.data.data.search) {\r\n    var query = []\r\n\r\n    // find all connected devices\r\n    if(event.data.data.search.connected) {\r\n        query.push('status:connected')\r\n    }\r\n\r\n    // find devices that have particular tags\r\n    if(event.data.data.search.tags) {\r\n        for(var key in event.data.data.search.tags) {\r\n            query.push('tags.'+key+': ' + event.data.data.search.tags[key])\r\n        }\r\n    }\r\n\r\n    var fullQuery = query.join(' AND ')\r\n\r\n    // search the endpoints and call a callback function for each endpoint to trigger the update.\r\n    endpoint.search(fullQuery, function(ep) {\r\n        var values = {}\r\n        values.result_ts = event.ts\r\n        values.result = 'in-progress'\r\n        report.publish('lwm2m-firmware',ep.key,event.ts,{values:values})\r\n        lwm2m.firmwareUpdate(ep.key,event.data.data.uri)\r\n    })\r\n}",
+      "filterType": "generic",
+      "filterGeneric": "lwm2m-fota",
+      "genericSample": "{\n  \"search\": {\n    \"connected\": true,\n    \"tags\": {\"version\":\"1.1.0\"}\n  },\n  \"uri\": \"http://localhost?ver=3.5.1\"\n}"
+    },
+    {
+      "id": "6264c868b90debc6c75cb079",
+      "name": "LWM2M - FOTA - On Complete",
+      "desc": "This trigger will fire when a FOTA operation completes.",
+      "type": "script",
+      "def": "var values = {}\r\n\r\nvalues.result_ts = event.ts\r\nvalues.result = event.data.result\r\n\r\n report.publish('lwm2m-firmware',event.endpoint.key,event.ts,{name: event.endpoint.name, values:values})",
+      "filterType": "lwm2m-firmware-update-complete"
+    },
+    {
+      "id": "61ba3baef1ffe97ab068b574",
+      "name": "LWM2M - FOTA - On Register",
+      "type": "script",
+      "def": "// This trigger is fired when devices register.  It will read object 3/0 as well as the version resource to \r\n// record metadata for the device in the report.\r\n\r\n// resource that holds the version of the device\r\nvar firmwareVersion = '{{.version_resource}}'\r\n\r\nvar readPaths = ['3/0']\r\nif(!firmwareVersion.startsWith('3/0')) {\r\n    readPaths.push(firmwareVersion)\r\n}\r\n\r\n// add additional reasources/instances to the paths here\r\n// readPaths.push('4/0')\r\n\r\nvar data = lwm2m.read(event.endpoint.key,readPaths,{translateIds: 'numbers', async:false})\r\n\r\nvar values = {}\r\nvar tags = {}\r\n\r\n// extract metadata from object 3 (device).\r\nif(data['3']) {\r\n    var inst = data['3']['0']\r\n\r\n    // set values to be added to the report, additional values can be added here.\r\n    values.manufacturer = inst['0']\r\n    values.model = inst['1']\r\n\r\n    // set tags on the endpoint for easy searches, additional tags can be added here.\r\n    tags['manufacturer'] = data['3']['0']['0']\r\n    tags['model'] = data['3']['0']['1']\r\n}\r\n\r\n// set a tag and a field in the report for the version specified above.\r\nvar firmwareParts = firmwareVersion.split('/')\r\nif(firmwareParts.length==3) {\r\n    var obj = data[firmwareParts[0]]\r\n    if(obj) {\r\n        var inst = obj[firmwareParts[1]]\r\n        if(inst) {\r\n            var res = inst[firmwareParts[2]]\r\n            if(res) {\r\n                values.version = res\r\n                tags['version'] = res\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\nvalues.version_ts = event.ts\r\n\r\nif(tags.length!=0) {\r\n    // add tags to the endpoints (if any are specified)\r\n    endpoint.updateTags(event.endpoint.key,tags,null)\r\n}\r\n\r\n// publish fields to the report\r\nreport.publish('lwm2m-firmware',event.endpoint.key,event.ts,{name: event.endpoint.name, values:values})",
+      "filterType": "lwm2m-register"
+    },
+    {
+      "id": "6264ccf5b90debc6c75cb07e",
+      "name": "LWM2M - FOTA - On Status Update",
+      "desc": "This trigger will fire when a FOTA operation has a state/status change.",
+      "type": "script",
+      "def": "var values = {}\r\n\r\nvalues.state_ts = event.ts\r\nvalues.state = event.data.state\r\n\r\n report.publish('lwm2m-firmware',event.endpoint.key,event.ts,{name: event.endpoint.name, values:values})",
+      "filterType": "lwm2m-firmware-update-status"
+    }
+  ],
+  "lwm2mObjDefs": null,
+  "reports": [
+    {
+      "fields": [
+        {
+          "aggregations": [
+            {
+              "name": "Versions",
+              "pivot": "version",
+              "type": "terms"
+            }
+          ],
+          "key": "version",
+          "name": "Version",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "aggregations": [
+            {
+              "name": "States",
+              "pivot": "state",
+              "type": "terms"
+            }
+          ],
+          "key": "state",
+          "name": "State",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "aggregations": [
+            {
+              "name": "Results",
+              "pivot": "result",
+              "type": "terms"
+            }
+          ],
+          "key": "result",
+          "name": "Result",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "key": "version_ts",
+          "name": "Version TS",
+          "required": false,
+          "type": "timestamp"
+        },
+        {
+          "key": "state_ts",
+          "name": "State TS",
+          "required": false,
+          "type": "timestamp"
+        },
+        {
+          "key": "result_ts",
+          "name": "Result TS",
+          "required": false,
+          "type": "timestamp"
+        },
+        {
+          "aggregations": [
+            {
+              "name": "Manufacturer",
+              "pivot": "manufacturer",
+              "type": "terms"
+            },
+            {
+              "name": "Version by Manufacturer",
+              "pivot": "version",
+              "type": "terms"
+            }
+          ],
+          "key": "manufacturer",
+          "name": "Manufacturer",
+          "required": false,
+          "type": "string"
+        }
+      ],
+      "id": "61ba1eb217f5604d1741b7b0",
+      "key": "lwm2m-firmware",
+      "name": "LWM2M - FOTA Report"
+    }
+  ]
+}

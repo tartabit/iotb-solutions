@@ -1,0 +1,25 @@
+{
+  "services": [
+    {
+      "id": "61a7e32ba4662e1b839551ca",
+      "name": "NimbeLink - Track",
+      "key": "nimbelink-track",
+      "modelId": "81f51ae0b339efbe51e8cdcb"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "61a7e36ca4662e1b839551cb",
+      "name": "NimbeLink - Send to Track",
+      "type": "script",
+      "def": "track.publish('nimbelink-track',event.data.data.key,event.data.data.ts,event.data.data)",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "nimbelink-data"
+        }
+      }
+    }
+  ]
+}

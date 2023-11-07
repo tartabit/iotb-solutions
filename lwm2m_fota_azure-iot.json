@@ -1,0 +1,48 @@
+{
+  "templateDef": [
+    {
+      "name": "Version resource",
+      "key": "version_resource",
+      "desc": "The LWM2M resource containing the firmware version.",
+      "value": "3/0/3"
+    },
+    {
+      "name": "IoT Hub service",
+      "key": "iothub",
+      "desc": "The IoT Hub service to use.",
+      "findServiceKey": "811382a6ea7fb1f40f682af3"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "62662546b90debc6c75cb0ae",
+      "name": "Azure IoT Hub - FOTA - Twin Changed",
+      "type": "script",
+      "def": "var twin = event.data.twin\r\nif(twin.fota && twin.fota.uri) {\r\n    lwm2m.firmwareUpdate(event.endpoint.key,twin.fota.uri)\r\n    azure_iot.twin_update('{{.iothub}}',event.endpoint.key,{fota:{uri: twin.fota.uri, result: 'in-progress'}})\r\n}\r\n",
+      "filterType": "azure-iot-twin-changed"
+    },
+    {
+      "id": "626628bcb90debc6c75cb0af",
+      "name": "Azure IoT Hub - FOTA - On Status Update",
+      "desc": "This trigger will fire when a FOTA operation has a state/status change.",
+      "type": "script",
+      "def": " azure_iot.twin_update('{{.iothub}}',event.endpoint.key,{fota: {state: event.data.state}})",
+      "filterType": "lwm2m-firmware-update-status"
+    },
+    {
+      "id": "626622a5b90debc6c75cb0ad",
+      "name": "Azure IoT Hub - FOTA - On Register",
+      "type": "script",
+      "def": "// This trigger is fired when devices register.  It will read object 3/0 as well as the version resource to \r\n// record metadata for the device in the report.\r\n\r\n// resource that holds the version of the device\r\nvar firmwareVersion = {{.version_resource}}\r\n\r\nvar readPaths = ['3/0']\r\nif(!firmwareVersion.startsWith('3/0')) {\r\n    readPaths.push(firmwareVersion)\r\n}\r\n\r\n// add additional reasources/instances to the paths here\r\n// readPaths.push('4/0')\r\n\r\nvar data = lwm2m.read(event.endpoint.key,readPaths,{translateIds: 'numbers', async:false})\r\n\r\nvar values = {}\r\nvar tags = {}\r\n\r\n// extract metadata from object 3 (device).\r\nif(data['3']) {\r\n    var inst = data['3']['0']\r\n\r\n    // set values to be added to the report, additional values can be added here.\r\n    values.manufacturer = inst['0']\r\n    values.model = inst['1']\r\n\r\n    // set tags on the endpoint for easy searches, additional tags can be added here.\r\n    tags['manufacturer'] = data['3']['0']['0']\r\n    tags['model'] = data['3']['0']['1']\r\n}\r\n\r\n// set a tag and a field in the report for the version specified above.\r\nvar firmwareParts = firmwareVersion.split('/')\r\nif(firmwareParts.length==3) {\r\n    var obj = data[firmwareParts[0]]\r\n    if(obj) {\r\n        var inst = obj[firmwareParts[1]]\r\n        if(inst) {\r\n            var res = inst[firmwareParts[2]]\r\n            if(res) {\r\n                values.version = res\r\n                tags['version'] = res\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\nvalues.version_ts = event.ts\r\n\r\nif(tags.length!=0) {\r\n    // add tags to the endpoints (if any are specified)\r\n    endpoint.updateTags(event.endpoint.key,tags,null)\r\n}\r\n\r\nvar update = {fota: values}\r\n\r\nvar twin = azure_iot.twin_retrieve('{{.iothub}}',event.endpoint.key)\r\nif(twin.desired.fota && twin.desired.fota.uri) {\r\n    update.fota.uri = twin.desired.fota.uri\r\n    update.fota.result = 'in-progress'\r\n    lwm2m.firmwareUpdate(event.endpoint.key,twin.desired.fota.uri)\r\n}\r\n\r\nazure_iot.twin_update('{{.iothub}}',event.endpoint.key,update)\r\n",
+      "filterType": "lwm2m-register"
+    },
+    {
+      "id": "626628f0b90debc6c75cb0b0",
+      "name": "Azure IoT Hub - FOTA - On Complete",
+      "desc": "This trigger will fire when a FOTA operation completes.",
+      "type": "script",
+      "def": " azure_iot.twin_update('{{.iothub}}',event.endpoint.key,{fota: {result: event.data.result}})",
+      "filterType": "lwm2m-firmware-update-complete"
+    }
+  ]
+}

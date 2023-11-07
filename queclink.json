@@ -1,0 +1,103 @@
+[
+  {
+    "leftImg": "/solutions/icons/queclink-logo.png",
+    "rightImg": "/solutions/icons/azure-iot.png",
+    "title": "Queclink to Azure IoT Hub",
+    "import": "/solutions/queclink_to_azure-iot.json",
+    "desc": "Connect a Queclink device to Azure IoT Hub.",
+    "prereqs": [
+      "Queclink device",
+      "Azure IoT Hub"
+    ],
+    "tags": [
+      "queclink",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/queclink-logo.png",
+    "rightImg": "/solutions/icons/azure-iot.png",
+    "title": "Queclink ASCII to Azure IoT Hub",
+    "import": "/solutions/queclink_ascii_to_azure-iot.json",
+    "desc": "Connect a Queclink ASCII device to Azure IoT Hub.",
+    "prereqs": [
+      "Queclink device",
+      "Azure IoT Hub"
+    ],
+    "tags": [
+      "queclink",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/queclink-logo.png",
+    "rightImg": "/solutions/icons/azure-iot-central.png",
+    "title": "Queclink to Azure IoT Central",
+    "import": "/solutions/queclink_to_azure-iot-central.json",
+    "desc": "Connect a Queclink device to Azure IoT Central.",
+    "prereqs": [
+      "Queclink device",
+      "Azure IoT Central"
+    ],
+    "tags": [
+      "queclink",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/queclink-logo.png",
+    "rightImg": "/solutions/icons/generic-decoder.png",
+    "title": "Publish Queclink generic events",
+    "import": "/solutions/queclink_to_generic.json",
+    "desc": "Publish 'data' events from Queclink devices.",
+    "prereqs": [
+      "Queclink device",
+      "Triggers consuming 'data' events"
+    ],
+    "tags": [
+      "queclink"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/queclink-logo.png",
+    "rightImg": "/solutions/icons/generic-webhook.png",
+    "title": "Send Queclink events to a webhook",
+    "import": "/solutions/queclink_to_webhook.json",
+    "desc": "Publish reports to an HTTP(S) webhook.",
+    "prereqs": [
+      "Queclink device",
+      "HTTP server to receive reports"
+    ],
+    "tags": [
+      "queclink",
+      "webhook"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/queclink-logo.png",
+    "rightImg": "/solutions/icons/generic-cloud.png",
+    "title": "Queclink Configuration OTA",
+    "import": "/solutions/queclink_config_ota.json",
+    "desc": "Handle configuration OTA requests via HTTP.",
+    "prereqs": [
+      "Queclink device"
+    ],
+    "tags": [
+      "queclink"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/queclink-logo.png",
+    "rightImg": "/solutions/icons/track.png",
+    "title": "Publish Queclink events to Track",
+    "import": "/solutions/queclink_to_track.json",
+    "desc": "Publish Queclink events to Tartabit Track.",
+    "prereqs": [
+      "Queclink device"
+    ],
+    "tags": [
+      "queclink",
+      "track"
+    ]
+  }
+]

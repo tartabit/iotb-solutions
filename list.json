@@ -1,0 +1,10 @@
+[
+  "lwm2m.json",
+  "generic.json",
+  "lora.json",
+  "iridium.json",
+  "micron.json",
+  "nimbelink.json",
+  "queclink.json",
+  "cdp_1nce.json"
+]

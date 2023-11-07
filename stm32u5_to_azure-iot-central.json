@@ -1,0 +1,106 @@
+{
+  "templateDef": [
+    {
+      "name": "LWM2M endpoint",
+      "key": "endpoint",
+      "desc": "The LWM2M endpoint.",
+      "value": "test_device",
+      "genStringLc": 16
+    },
+    {
+      "name": "LWM2M identity",
+      "key": "identity",
+      "desc": "The LWM2M identity, must be a string.",
+      "value": "test_device",
+      "genString": 16
+    },
+    {
+      "name": "LWM2M Pre-shared key",
+      "key": "psk",
+      "desc": "Pre-shared key as hex encoded string.",
+      "value": "11223344556677889900",
+      "genHex": 16
+    },
+    {
+      "name": "Azure IoT Central ID Scope",
+      "key": "iotc_id_scope",
+      "desc": "Enter the ID Scope for your IoT Central application.",
+      "value": "0nexxxxxxx"
+    },
+    {
+      "name": "Azure IoT Central Access Key",
+      "key": "iotc_access_key",
+      "desc": "Enter the primary or secondary shared access key for group enrollment."
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "62ab596723ad706e7533ef41",
+      "serviceId": "62ab542923ad706e7533ef3c",
+      "name": "STMicro U5 ({{.endpoint}})",
+      "key": "st-{{.endpoint}}",
+      "params": {
+        "endpoint": "{{.endpoint}}",
+        "identity": "{{.identity}}",
+        "psk": "{{.psk}}"
+      }
+    }
+  ],
+  "services": [
+    {
+      "id": "62ab5b2d23ad706e7533ef42",
+      "name": "Azure IoT Central",
+      "key": "azure-iot-central",
+      "modelId": "811382a6ea7fb1f40f682af3",
+      "params": {
+        "activity_timeout": "3600",
+        "authentication": "DPS",
+        "dps_access_key": "{{.iotc_access_key}}",
+        "dps_id_scope": "{{.iotc_id_scope}}",
+        "dtdlmodelid": "dtmi:stmicroelectronics:b_u585i_iot02a:standard_fw;1",
+        "identity_rate_limit": "10"
+      }
+    },
+    {
+      "id": "62ab542923ad706e7533ef3c",
+      "name": "LWM2M Server",
+      "key": "lwm2m",
+      "modelId": "8162da7fee748d33d09ab7c1",
+      "params": {
+        "bootstrap_lifetime": "60",
+        "coap_blocksize": "1024",
+        "coap_retransmit_count": "3",
+        "coap_retransmit_timeout": "5"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "62ab5b2d23ad706e7533ef44",
+      "name": "Azure IoT Central - Handle LWM2M data",
+      "type": "script",
+      "def": "var model = {\r\n  telemetry: { },\r\n  properties: {\r\n  }\r\n}\r\n\r\nif(event.data.data.temperature_3303) {\r\n  model.telemetry.temperature = event.data.data.temperature_3303['0'].sensor_value_5700\r\n}\r\n\r\nif(event.data.data.humidity_3304) {\r\n  model.telemetry.humidity = event.data.data.humidity_3304['0'].sensor_value_5700\r\n}\r\n\r\nif(event.data.data.pressure_3323) {\r\n  model.telemetry.pressure = event.data.data.pressure_3323['0'].sensor_value_5700\r\n}\r\n\r\nif(event.data.data.accelerometer_3313) {\r\n  model.telemetry.acceleration = { \r\n    x: event.data.data.accelerometer_3313['0'].x_value_5702,\r\n    y: event.data.data.accelerometer_3313['0'].y_value_5703,\r\n    z: event.data.data.accelerometer_3313['0'].z_value_5704\r\n  }\r\n}\r\n\r\nif(event.data.data.magnetometer_3314) {\r\n  model.telemetry.magnetometer = { \r\n    x: event.data.data.magnetometer_3314['0'].x_value_5702,\r\n    y: event.data.data.magnetometer_3314['0'].y_value_5703,\r\n    z: event.data.data.magnetometer_3314['0'].z_value_5704\r\n  }\r\n}\r\n\r\nif(event.data.data.gyrometer_3334) {\r\n  model.telemetry.gyroscope = { \r\n    x: event.data.data.gyrometer_3334['0'].x_value_5702,\r\n    y: event.data.data.gyrometer_3334['0'].y_value_5703,\r\n    z: event.data.data.gyrometer_3334['0'].z_value_5704\r\n  }\r\n}\r\n\r\nazure_iot.send('azure-iot-central', event.endpoint.key, model.telemetry, { 'iothub-creation-time-utc': event.ts, '$.sub': 'std_comp' });\r\n\r\nif(event.data.data.device_3) {\r\n    model.properties.deviceinfo = {\r\n        '__t': 'c',\r\n        manufacturer: event.data.data.device_3['0'].manufacturer_0,\r\n        swVersion: event.data.data.device_3['0'].firmware_version_3\r\n    }\r\n    azure_iot.twin_update('azure-iot-central', event.endpoint.key, model.properties)\r\n}\r\n\r\n",
+      "filterType": "lwm2m-data",
+      "filterCustom": {
+        "translateIds": {
+          "comp": "ne",
+          "value": "numbers"
+        }
+      }
+    },
+    {
+      "id": "62ab542923ad706e7533ef3d",
+      "name": "LWM2M - On Registration",
+      "type": "script",
+      "def": "lwm2m.write(event.endpoint.key, '1/0/1', 60)\n\n// observes broken\n//lwm2m.observe(event.endpoint.key, ['3300/0/5700', '3304/0/5700', '3323/0/5700'])\n\nlwm2m.read(event.endpoint.key, ['/3/0', '/4/0', '3303/0/5700', '3304/0/5700', '3323/0/5700', '3313/0', '3314/0', '3334/0'])\n",
+      "filterType": "lwm2m-register"
+    },
+    {
+      "id": "62ab542923ad706e7533ef3e",
+      "name": "LWM2M - On Update",
+      "type": "script",
+      "def": "lwm2m.read(event.endpoint.key, ['3303/0/5700', '3304/0/5700', '3323/0/5700', '3313/0', '3314/0', '3334/0'])",
+      "filterType": "lwm2m-update"
+    }
+  ]
+}

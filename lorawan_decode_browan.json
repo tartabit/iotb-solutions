@@ -1,0 +1,18 @@
+{
+  "triggers": [
+    {
+      "id": "6024395a25ea1b075c6b74a6",
+      "name": "Decode Browan Object Locator sensors",
+      "version": 0,
+      "type": "script",
+      "def": "var bin = convert.b64ToBin(event.data.data.data)\r\n\r\nfunction intFromBytes( x ){\r\n  var val = 0;\r\n  for (var i = x.length-1; i>=0; --i) {\r\n    val += x[i];        \r\n    if (i > 0) {\r\n      val = val << 8;\r\n    }\r\n  }\r\n  return val;\r\n}\r\n\r\nvar batBin = bin[1]\r\nvar bat = batBin >> 4\r\nbat = bat / 15.0 * 100.0\r\n\r\nvar latBin = bin.slice(3,7)\r\nif((latBin[3] & 0x08)>0) {\r\n  latBin[3] = latBin[3] | 0xF0\r\n} else {\r\n  latBin[3] = latBin[3] & 0x0F\r\n}\r\nvar lat = intFromBytes(latBin) / 1000000\r\n\r\nvar lngBin = bin.slice(7)\r\nif((lngBin[3] & 0x10)>0) {\r\n  lngBin[3] = lngBin[3] | 0xE0\r\n} else {\r\n  lngBin[3] = lngBin[3] & 0x1F\r\n}\r\nvar lng = intFromBytes(lngBin) / 1000000\r\n\r\nvar obj = {}\r\nobj.endpointKey = event.endpoint.key\r\nobj.ts = event.ts\r\nobj.battery = bat\r\nobj.lat = lat\r\nobj.lng = lng\r\nexec.now('data', obj)\r\n",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "browan-uplink"
+        }
+      }
+    }
+  ]
+}

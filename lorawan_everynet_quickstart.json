@@ -1,0 +1,48 @@
+{
+  "templateDef": [
+    {
+      "name": "Webhook",
+      "key": "webhook",
+      "desc": "The webhook secret to use when publishing.",
+      "value": "abc123",
+      "genString": 32
+    }
+  ],
+  "services": [
+    {
+      "id": "60f06429a6eb43be1080023b",
+      "name": "Everynet HTTP Listener",
+      "key": "http_everynet",
+      "modelId": "81da3cb1d06f8a8fbbcbefad",
+      "params": {
+        "endpoint_key_type": "body",
+        "endpoint_key_field": "meta.device",
+        "webhook": "{{.webhook}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "60f8d9543c81575b0d55eca2",
+      "name": "HTTP Post from Everynet (Uplink)",
+      "type": "script",
+      "def": "exec.now('data-uplink',{data:event.data.body.params.payload, port: event.data.body.params.port})\r\n\r\ntrigger.reply({status:200})",
+      "filterType": "http-post",
+      "filterCustom": {
+        "body.type": {
+          "comp": "eq",
+          "value": "uplink"
+        }
+      },
+      "filterServiceId": "60f06429a6eb43be1080023b"
+    },
+    {
+      "id": "60f8d93fa6eb43be1080023c",
+      "name": "HTTP Options from Everynet",
+      "type": "script",
+      "def": "trigger.reply({status:200, headers:{Allow:'OPTIONS, GET, POST'}})",
+      "filterType": "http-options",
+      "filterServiceId": "60f06429a6eb43be1080023b"
+    }
+  ]
+}

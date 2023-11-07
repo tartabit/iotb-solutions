@@ -1,0 +1,50 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    },
+    {
+      "name": "Azure IoT Central ID Scope",
+      "key": "dps_id_scope",
+      "desc": "Enter the ID Scope for your IoT Central application.",
+      "value": "0nexxxxxxx"
+    },
+    {
+      "name": "Azure IoT Central Access Key",
+      "key": "dps_access_key",
+      "desc": "Enter the primary or secondary shared access key for group enrollment."
+    }
+  ],
+  "services": [
+    {
+      "id": "6092bed1943d9e84f1ce5acb",
+      "name": "Azure IoT Central ({{.prefix}})",
+      "key": "{{.prefix}}_azure_iotcentral",
+      "modelId": "811382a6ea7fb1f40f682af3",
+      "params": {
+        "activity_timeout": "600",
+        "authentication": "DPS",
+        "dps_id_scope": "{{.dps_id_scope}}",
+        "dps_access_key": "{{.dps_access_key}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "61e1f77a3133968f08ab43c9",
+      "name": "Micron - Send to IoT Central ({{.prefix}})",
+      "type": "script",
+      "def": "var model = {\r\n  telemetry: {\r\n    event: event.data.data.event,\r\n    state: 'normal',\r\n  },\r\n  properties: {}\r\n}\r\n\r\nif(event.data.data.gps) {\r\n    model.telemetry.location = {\r\n      lat: event.data.data.gps.latitude,\r\n      lon: event.data.data.gps.longitude,\r\n      alt: event.data.data.gps.altitude\r\n    }\r\n    model.telemetry.heading = event.data.data.gps.heading\r\n    model.telemetry.speed = event.data.data.gps.speed\r\n    model.telemetry.fixType = 'gps'\r\n    model.properties.lastKnownLocation = model.telemetry.location\r\n}\r\nif(event.data.data.battery) {\r\n    model.telemetry.battery = event.data.data.battery\r\n}\r\nif(event.data.data.motion) {\r\n    model.telemetry.motion = event.data.data.motion\r\n}\r\n\r\nazure_iot.send('{{.prefix}}_azure_iotcentral',event.data.data.key,model.telemetry)\r\nazure_iot.twin_update('{{.prefix}}_azure_iotcentral',event.data.data.key,model.properties)",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "micron-data"
+        }
+      }
+    }
+  ]
+}

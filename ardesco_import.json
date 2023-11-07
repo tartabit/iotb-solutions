@@ -1,0 +1,35 @@
+{
+  "templateDef": [
+    {
+      "name": "Device IMEI",
+      "key": "imei",
+      "desc": "The IMEI for your Ardesco device.",
+      "value": "<imei>"
+    },
+    {
+      "name": "Pre-shared key (hex)",
+      "key": "psk",
+      "desc": "The pre-shared key you created for your Ardesco device.",
+      "value": "11223344556677889900"
+    },
+    {
+      "name": "LWM2M Service",
+      "key": "service",
+      "desc": "Select a previously defined LWM2M service.",
+      "findService": "8162da7fee748d33d09ab7c1"
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "5f638853b75c5a1231988082",
+      "serviceId": "{{.service}}",
+      "name": "Ardesco - {{.imei}}",
+      "key": "{{.imei}}",
+      "params": {
+        "endpoint": "{{ .imei}}",
+        "identity": "{{ .imei}}",
+        "psk": "{{ .psk}}"
+      }
+    }
+  ]
+}

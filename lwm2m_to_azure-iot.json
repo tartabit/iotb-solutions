@@ -1,0 +1,86 @@
+{
+  "templateDef": [
+    {
+      "name": "Azure connection string",
+      "key": "conn_string",
+      "desc": "Enter the connection string for a policy with 'iothubowner' rights.",
+      "value": "HostName=****.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=********"
+    }
+  ],
+  "services": [
+    {
+      "id": "5f5b9e49dfb509446ef1b73f",
+      "name": "Azure IoT Hub",
+      "key": "azure-iothub",
+      "modelId": "811382a6ea7fb1f40f682af3",
+      "params": {
+        "activity_timeout": "3600",
+        "authentication": "ServiceAccount",
+        "connection_string": "{{.conn_string}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "6206c7fdec6a2b6be72d9c8d",
+      "name": "Azure IoT Hub - Handle C2D Events",
+      "type": "script",
+      "def": "lwm2m.write(event.data.deviceId, event.data.data.path, event.data.data.data)",
+      "filterType": "azure-iot-event",
+      "filterServiceId": "5f5b9e49dfb509446ef1b73f",
+      "filterCustom": {
+        "properties.op": {
+          "comp": "eq",
+          "value": "write"
+        }
+      }
+    },
+    {
+      "id": "6206c7fdec6a2b6be72d9c9a",
+      "name": "Azure IoT Hub - Handle Twin Changes",
+      "desc": "Receives twin desired changes and writes them to the device.",
+      "type": "script",
+      "def": "lwm2m.writeMulti(event.endpoint.key,event.data.twin)\r\n\r\n/*\r\ndesired property should be written as follows\r\n{\r\n    3: {\r\n        0: {\r\n            15: 'UTC'\r\n        }\r\n    }\r\n}\r\n*/",
+      "filterType": "azure-iot-twin-changed",
+      "filterServiceId": "5f5b9e49dfb509446ef1b73f"
+    },
+    {
+      "id": "6206c7fdec6a2b6be72d9c98",
+      "name": "Azure IoT Hub - Method Handler",
+      "type": "script",
+      "def": "var data = undefined\r\n\r\nvar encoding = 'tlv';\r\nif(event.data.payload.encoding) {\r\n    encoding = event.data.payload.encoding;\r\n}\r\n\r\nswitch(event.data.method) {\r\n  case 'create':\r\n    lwm2m.create(event.endpoint.key, event.data.payload.path, event.data.payload.data)\r\n    break\r\n  case 'exec':\r\n    lwm2m.exec(event.endpoint.key, event.data.payload.path)\r\n    break\r\n  case 'fota':\r\n    lwm2m.firmwareUpdate(event.endpoint.key,event.data.payload.uri,{context: {replyId: event.data.replyId, method:'fota'}})\r\n    trigger.exit()\r\n    break\r\n  case 'observe':\r\n    lwm2m.observe(event.endpoint.key, event.data.payload.path, {encoding: encoding})\r\n    break\r\n  case 'read':\r\n    data = lwm2m.read(event.endpoint.key, event.data.payload.path, {async: false, encoding: encoding})\r\n    break\r\n  case 'write':\r\n    lwm2m.write(event.endpoint.key, event.data.payload.path, event.data.payload.data, {encoding:encoding})\r\n    break\r\n  case 'write-attrs':\r\n    // attrs = {pmin: 20, pmax: 10, st: 1, gt: 2, lt: 5}\r\n    lwm2m.writeAttrs(event.endpoint.key, event.data.payload.path, event.data.payload.attrs)\r\n    break\r\n  default:\r\n    trigger.exit()\r\n}\r\nazure_iot.method_complete(event.data.serviceKey, event.data.deviceId, event.data.replyId)",
+      "filterType": "azure-iot-direct-method",
+      "filterServiceId": "5f5b9e49dfb509446ef1b73f"
+    },
+    {
+      "id": "6206c7fdec6a2b6be72d9c8e",
+      "name": "LWM2M - FOTA Complete (method reply)",
+      "type": "script",
+      "def": "azure_iot.method_complete('azure-iothub', event.endpoint.key, event.data.context.replyId,event.data)",
+      "filterType": "lwm2m-firmware-update-complete",
+      "filterCustom": {
+        "context.replyId": {
+          "comp": "exists",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "6206c7fdec6a2b6be72d9c92",
+      "name": "Azure IoT Hub - Handle raw data",
+      "type": "script",
+      "def": "\n// update data in the twin\nazure_iot.twin_update('azure-iothub', event.endpoint.key, event.data.data);\n\n// send same data as telemetry\nvar data = event.data.data;\ndata.ts = event.ts;\nazure_iot.send('azure-iothub', event.endpoint.key, data);",
+      "filterType": "lwm2m-data"
+    },
+    {
+      "id": "6260c8bce7b4eb34cd326d28",
+      "name": "Azure IoT Hub - Handle simplified data",
+      "type": "script",
+      "def": "// if data comes in combined mode, this will trim the ID off the end of the string for readability\r\nvar trimIds = true\r\n\r\nvar model = {  \r\n  ts: event.ts,\r\n  location: {},\r\n  values: {}\r\n}\r\n\r\nif(event.data.data.location_6) {\r\n  var loc = event.data.data.location_6['0']\r\n  model.location = {lat: loc.latitude_0, lon: loc.longitude_1 }\r\n}\r\n\r\nvar objName = ''\r\nvar objTrackName = ''\r\nfor(objName in event.data.data) {\r\n    objTrackName = objName\r\n    if(isNaN(objName)) {\r\n        var tail = objName.lastIndexOf('_')\r\n        var objNum = objName.substring(tail+1)\r\n        if(!isNaN(objNum && trimIds)) {\r\n          objTrackName = objName.substring(0, tail)\r\n        }\r\n    }\r\n\r\n    if(Object.keys(event.data.data[objName]).length===1) {\r\n        var inst = event.data.data[objName]['0']\r\n        // single instance\r\n        var resName = ''\r\n        var resTrackName = ''\r\n        for(resName in inst) {\r\n            resTrackName = resName\r\n            if(isNaN(resName)) {\r\n              var tail = resName.lastIndexOf('_')\r\n              var resNum = resName.substring(tail+1)\r\n              if(!isNaN(resNum && trimIds)) {\r\n                resTrackName = resName.substring(0, tail)\r\n              }\r\n            }\r\n\r\n            if(typeof inst[resName] === 'object' || Array.isArray(inst[resName])) {\r\n                // do nothing\r\n            } else {\r\n              model.values[objTrackName+'_'+resTrackName] = inst[resName]\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n// update data in the twin\r\nazure_iot.twin_update('azure-iothub', event.endpoint.key, model);\r\n\r\n// send same data as telemetry\r\nazure_iot.send('azure-iothub', event.endpoint.key, model);",
+      "filterType": "lwm2m-data"
+    }
+  ],
+  "doNotStartTriggers": [
+    "6260c8bce7b4eb34cd326d28"
+  ]
+}

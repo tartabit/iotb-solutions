@@ -1,0 +1,54 @@
+{
+  "templateDef": [
+    {
+      "name": "Azure IoT Central ID Scope",
+      "key": "dps_id_scope",
+      "desc": "Enter the ID Scope for your IoT Central application.",
+      "value": "0nexxxxxxx"
+    },
+    {
+      "name": "Azure IoT Central Access Key",
+      "key": "dps_access_key",
+      "desc": "Enter the primary or secondary shared access key for group enrollment."
+    }
+  ],
+  "services": [
+    {
+      "id": "627a94ce69a3c4907fb17501",
+      "name": "Azure IoT Central",
+      "key": "azure-iot-central",
+      "modelId": "811382a6ea7fb1f40f682af3",
+      "params": {
+        "activity_timeout": "3600",
+        "authentication": "DPS",
+        "dps_id_scope": "{{.dps_id_scope}}",
+        "dps_access_key": "{{.dps_access_key}}",
+        "dtdlmodelid": "dtmi:tartabit:Generic;1",
+        "identity_rate_limit": "10"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "627a94ce69a3c4907fb17504",
+      "name": "Azure IoT Central - Method Handler",
+      "type": "script",
+      "def": "var data = undefined\r\n\r\nvar command = event.data.payload.replace(/['\"]+/g, '');\r\nvar obj = convert.delimitedStringToObject(command,'command|path|value|encoding',',')\r\n\r\nlog.trace('command', obj)\r\n\r\nvar encoding = 'tlv';\r\nif(obj.encoding && obj.command!='write-attrs') {\r\n    encoding = obj.encoding;\r\n}\r\n\r\nswitch(obj.command) {\r\n  case 'create':\r\n    lwm2m.create(event.endpoint.key, obj.path, obj.data)\r\n    break\r\n  case 'exec':\r\n    lwm2m.exec(event.endpoint.key, obj.path)\r\n    break\r\n  case 'fota':\r\n    lwm2m.firmwareUpdate(event.endpoint.key,obj.uri,{context: {replyId: event.data.replyId, method:'fota'}})\r\n    trigger.exit()\r\n    break\r\n  case 'observe':\r\n    lwm2m.observe(event.endpoint.key, obj.path, {encoding: encoding})\r\n    break\r\n  case 'read':\r\n    data = lwm2m.read(event.endpoint.key, obj.path, {async: false, encoding: encoding})\r\n    break\r\n  case 'write':\r\n    lwm2m.write(event.endpoint.key, obj.path, obj.data, {encoding:encoding})\r\n    break\r\n  case 'write-attrs':\r\n    // attrs = {pmin: 20, pmax: 10, st: 1, gt: 2, lt: 5}\r\n    attrs = JSON.parse(obj.encoding)\r\n    lwm2m.writeAttrs(event.endpoint.key, obj.path, obj.attrs)\r\n    break\r\n  default:\r\n    azure_iot.method_complete(event.data.serviceKey, event.data.deviceId, event.data.replyId, 'command [' + obj.command + '] not found', 500)\r\n    trigger.exit()\r\n}\r\nazure_iot.method_complete(event.data.serviceKey, event.data.deviceId, event.data.replyId)",
+      "filterType": "azure-iot-direct-method",
+      "filterServiceId": "627a94ce69a3c4907fb17501"
+    },
+    {
+      "id": "627a94ce69a3c4907fb17508",
+      "name": "Azure IoT Central - Handle LWM2M data",
+      "type": "script",
+      "def": "// if data comes in combined mode, this will trim the ID off the end of the string for readability\r\nvar trimIds = true\r\n\r\nvar telem = {\r\n  event: 'lwm2m-' + event.data.source,\r\n  sensors: {}\r\n}\r\n\r\nvar twin = {}\r\n\r\nif (event.data.data.location_6) {\r\n  var loc = event.data.data.location_6['0']\r\n  telem.location = { lat: loc.latitude_0, lon: loc.longitude_1 }\r\n  twin.lastKnownLocation = { lat: loc.latitude_0, lon: loc.longitude_1 }\r\n}\r\nif (event.data.data.location) {\r\n  var loc = event.data.data.location['0']\r\n  telem.location = { lat: loc.latitude, lon: loc.longitude }\r\n  twin.lastKnownLocation = { lat: loc.latitude, lon: loc.longitude }\r\n}\r\n\r\nvar objName = ''\r\nvar objNormName = ''\r\nfor (objName in event.data.data) {\r\n  if (objName == 'location_6' || objName == 'location') {\r\n    continue\r\n  }\r\n  objNormName = objName\r\n  if (isNaN(objName)) {\r\n    var tail = objName.lastIndexOf('_')\r\n    var objNum = objName.substring(tail + 1)\r\n    if (!isNaN(objNum && trimIds)) {\r\n      objNormName = objName.substring(0, tail)\r\n    }\r\n  }\r\n\r\n  var instName = ''\r\n  for (instName in event.data.data[objName]) {\r\n    // iterate over instances\r\n    var inst = event.data.data[objName][instName]\r\n    if (instName === '0') {\r\n      instName = ''\r\n    }\r\n    // single instance\r\n    var resName = ''\r\n    var resNormName = ''\r\n    for (resName in inst) {\r\n      resNormName = resName\r\n      if (isNaN(resName)) {\r\n        var tail = resName.lastIndexOf('_')\r\n        var resNum = resName.substring(tail + 1)\r\n        if (!isNaN(resNum && trimIds)) {\r\n          resNormName = resName.substring(0, tail)\r\n        }\r\n      }\r\n\r\n      var val = inst[resName]\r\n      switch (typeof val) {\r\n        case 'object':\r\n          // ignore\r\n          break\r\n        case 'string':\r\n          telem.sensors[objNormName + '_' + resNormName + instName] = { string: val }\r\n          break\r\n        case 'number':\r\n          telem.sensors[objNormName + '_' + resNormName + instName] = { number: val }\r\n          break\r\n        case 'boolean':\r\n          telem.sensors[objNormName + '_' + resNormName + instName] = { boolean: val }\r\n          break\r\n      }\r\n    }\r\n  }\r\n}\r\n\r\n// update data in the twin\r\nazure_iot.twin_update('azure-iot-central', event.endpoint.key, twin);\r\n\r\n// send same data as telemetry\r\nazure_iot.send('azure-iot-central', event.endpoint.key, telem, { 'iothub-creation-time-utc': event.ts });",
+      "filterType": "lwm2m-data",
+      "filterCustom": {
+        "translateIds": {
+          "comp": "ne",
+          "value": "numbers"
+        }
+      }
+    }
+  ]
+}

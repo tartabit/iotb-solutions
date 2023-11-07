@@ -1,0 +1,77 @@
+{
+  "templateDef": [
+    {
+      "name": "Azure IoT Central ID Scope",
+      "key": "dps_id_scope",
+      "desc": "Enter the ID Scope for your IoT Central application.",
+      "value": "0nexxxxxxx"
+    },
+    {
+      "name": "Azure IoT Central Access Key",
+      "key": "dps_access_key",
+      "desc": "Enter the primary or secondary shared access key for group enrollment."
+    },
+    {
+      "name": "LoRa LNS Webhook",
+      "key": "webhook",
+      "desc": "The webhook secret to used when configuring your LNS.",
+      "value": "abc123",
+      "genString": 32
+    },
+    {
+      "name": "LoRa Cloud API Key",
+      "key": "loraCloudApiKey",
+      "desc": "The API key to access your LoRa Cloud account."
+    }
+  ],
+  "services": [
+    {
+      "id": "627d3c1755c02fa3286058b3",
+      "name": "LoRa Edge Tracker - Azure IoT Central",
+      "key": "edge-azure-iot-central",
+      "modelId": "811382a6ea7fb1f40f682af3",
+      "params": {
+        "activity_timeout": "7200",
+        "authentication": "DPS",
+        "dps_access_key": "{{.dps_acess_key}}",
+        "dps_id_scope": "{{.dps_id_scope}}",
+        "dtdlmodelid": "dtmi:tartabitIotc:LoRaEdgeTracker_57t;1",
+        "identity_rate_limit": "10"
+      }
+    },
+    {
+      "id": "627bdf3e55c02fa32860588c",
+      "name": "LoRa Edge Tracker - LNS Receiver",
+      "key": "edge-lora",
+      "modelId": "815372fc057f912842b2ce55",
+      "params": {
+        "include_lns_info": "true",
+        "senet_url": "portal.senetco.io",
+        "webhook": "{{.webhook}}"
+      }
+    },
+    {
+      "id": "627be11b55c02fa32860588d",
+      "name": "LoRa Edge Tracker - Lora Cloud Connection",
+      "key": "edge-lora-cloud",
+      "modelId": "81da3cb1d06f8a8fbbcbefad"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "627be27655c02fa32860588e",
+      "name": "LoRa Edge Tracker - Handle Uplinks",
+      "type": "script",
+      "def": "\r\n// set to true for extra debug logging\r\nvar debug = false\r\n\r\n//Enter your LoraCloud API key here\r\nvar apiKey = '{{.loraCloudApiKey}}'\r\n\r\n\r\n// format deviceEui with dashes\r\nvar devEui = event.endpoint.key.match(/.{1,2}/g).join('-');\r\n\r\nfunction callLoraCloud(op, obj) {\r\n    var req = {\r\n        \"deveui\": devEui,\r\n        \"uplink\": obj\r\n    }\r\n    if(debug) log.trace(op + ' req', JSON.stringify(req))\r\n    var rsp = http.post('edge-lora-cloud', 'https://mgs.loracloud.com/api/v1/device/send', req, { headers: { 'Authorization': apiKey, 'Content-Type': 'application/json' } })\r\n    if(debug) log.trace(op + ' resp', rsp)\r\n\r\n    if (rsp.status == '200') {\r\n        if (rsp.body.result) {\r\n            return rsp.body.result\r\n        }\r\n        return null\r\n    }\r\n}\r\n\r\nvar model = {\r\n    values: { lns: event.data.source}\r\n}\r\n\r\nfunction handleWifi(data) {\r\n    var obj = {\r\n        msgtype: \"wifi\",\r\n        payload: '01' + convert.binToHex(data.slice(5, data.length))\r\n    }\r\n\r\n    var result = callLoraCloud('wifi', obj)\r\n\r\n    if(result.position_solution && result.position_solution.llh) {\r\n        model.location = {lat: result.position_solution.llh[0], lon: result.position_solution.llh[1] }\r\n        model.values.altitude = result.position_solution.llh[2]\r\n        model.values.locFixType = result.position_solution.algorithm_type\r\n        model.values.locFixAccuracy = result.position_solution.accuracy\r\n    }\r\n\r\n}\r\n\r\nfunction handleSensors(data) {\r\n    var motion = (data[0] & 0x01) == 0x01\r\n    if (data.length == 7) {\r\n        var temp = (data[1] * 256 + data[2]) / 100\r\n        if(debug) log.trace('sensor', { temp: temp, motion: motion })\r\n        model.values.temperature = temp\r\n    } else {\r\n        if(debug) log.trace('sensor', { motion: motion })\r\n    }\r\n    model.values.motion = motion\r\n}\r\n\r\nfunction handleStreamRecord(rec) {\r\n    var streamHex = rec[1]\r\n    var streamRaw = convert.hexToBin(streamHex)\r\n    for (var idx = 0; idx < streamRaw.length;) {\r\n        var tag = streamRaw[idx]\r\n        var length = streamRaw[idx + 1]\r\n        var data = streamRaw.slice(idx + 2, idx + 2 + length)\r\n        idx += length + 2\r\n        if(debug) log.trace('stream', { tag: tag.toString(16), length: length, data: convert.binToHex(data), dataLen: data.length })\r\n\r\n        switch (tag) {\r\n            case 0x0e:\r\n                handleWifi(data)\r\n                break\r\n            case 0x0d:\r\n                handleSensors(data)\r\n                break\r\n            default:\r\n                log.warn('unhandled stream data (' + tag.toString(16) + ')', { tag: tag.toString(16), length: length, data: convert.binToHex(data), dataLen: data.length })\r\n                break\r\n        }\r\n    }\r\n}\r\n\r\n// var testRec = [4506, \"0e8301627d0128a61cf29a7bfcfda40c473d6e04b8a4283b82457547a5b6be761f325ea3b0be761f388acf265a4c2bd590ac1cf29a7bd953b816c0e21eee56a41a59c04ca564ab38b1db7f4c79af1ef29a7bd950a310d7b0dd4196b30a6f0c3a3403a984d81b8415e7adb0be76b1ee4aa42cfda1304688d880029c61b754b9b0bbe55f038e0d07100a28000f0dd5\" ]\r\n\r\n//handleStreamRecord(testRec)\r\n\r\ntry {\r\n    var obj = {\r\n        fcnt: event.data.lns.fcnt,\r\n        port: event.data.fPort,\r\n        payload: convert.binToHex(event.data.raw)\r\n    }\r\n    var result = callLoraCloud('uplink', obj)\r\n    if (result) {\r\n        if (result.dnlink && result.dnlink.payload) {\r\n            //handle downlinks\r\n            log.trace('scheduling downlink', result.dnlink)\r\n            lora.downlink(event.endpoint.key, convert.hexToBin(result.dnlink.payload), result.dnlink.port)\r\n        }\r\n\r\n        if(result.info_fields) {\r\n        if(result.info_fields.charge) model.values.charge = result.info_fields.charge.value\r\n        if(result.info_fields.signal) {\r\n            model.values.rssi = result.info_fields.signal.value.rssi\r\n            model.values.snr = result.info_fields.signal.value.snr\r\n        }\r\n        if(result.info_fields.temp) model.values.temperature = result.info_fields.temp.value\r\n        if(result.info_fields.voltage) model.values.voltage = result.info_fields.voltage.value\r\n        }\r\n\r\n        if (result.stream_records && result.stream_records.length > 0) {\r\n            //handle streams\r\n            result.stream_records.forEach(handleStreamRecord)\r\n        }\r\n\r\n        if(debug) log.trace('model', model)\r\n        exec.now('edge-tracker-data',model)\r\n    }\r\n\r\n} catch (e) {\r\n    log.warn('resp-err', e)\r\n}",
+      "filterType": "lora-uplink"
+    },
+    {
+      "id": "627d3c1755c02fa3286058b4",
+      "name": "LoRa Edge Tracker - Send to IoT Central",
+      "type": "script",
+      "def": "/*\n{\n  \"data\": {\n    \"location\": {\n      \"lat\": 45.448873,\n      \"lon\": -75.635627\n    },\n    \"values\": {\n      \"altitude\": 0,\n      \"charge\": 9,\n      \"locFixAccuracy\": 22,\n      \"locFixType\": \"wifi\",\n      \"motion\": false,\n      \"rssi\": -31,\n      \"snr\": 13,\n      \"temperature\": 23,\n      \"voltage\": 3.6\n    }\n  },\n  \"key\": \"edge-tracker-data\",\n  \"raw\": \"\"\n}\n*/\n\nvar model = {\n  telemetry: {},\n  properties: {}\n}\n\nif(event.data.data.values) {\n    var values = event.data.data.values\n    model.telemetry = values\n    if(model.telemetry.temperature) {\n        model.telemetry.temperature = model.telemetry.temperature * 9.0 / 5.0 + 32.0\n    }\n    if(model.telemetry.motion) {\n        model.telemetry.motion = 1        \n    } else {\n        model.telemetry.motion = 0\n    }\n    if(model.telemetry.lns) {\n        model.properties.lns = model.telemetry.lns\n        delete model.telemetry.lns;\n    }\n}\nif(event.data.data.location) {\n    model.telemetry.location = event.data.data.location\n    if(model.telemetry.altitude) {\n        model.telemetry.alt = model.telemetry.altitude\n    }\n}\ndelete model.telemetry.altitude\n\nazure_iot.send('edge-azure-iot-central', event.endpoint.key, model.telemetry);\nazure_iot.twin_update('edge-azure-iot-central', event.endpoint.key, model.properties);\n",
+      "filterType": "generic",
+      "filterGeneric": "edge-tracker-data"
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "templateDef": [
+    {
+      "name": "Access Key ID",
+      "key": "access_key_id",
+      "desc": "Enter the IAM access key ID.",
+      "value": "AKIA*********"
+    },
+    {
+      "name": "Secret Access Key",
+      "key": "secret_key",
+      "desc": "Enter the IAM user secret access key."
+    },
+    {
+      "name": "AWS Region",
+      "key": "region",
+      "desc": "Enter the region for your SQS queues."
+    },
+    {
+      "name": "AWS Account ID",
+      "key": "account_id",
+      "desc": "Enter the AQS account ID that owns the SQS queues."
+    },
+    {
+      "name": "SQS MO Queue Name",
+      "key": "sqs_mo_name",
+      "desc": "Enter the name of your MO Queue.",
+      "value": "ICCMO.fifo"
+    },
+    {
+      "name": "SQS MT Queue Name",
+      "key": "sqs_mt_name",
+      "desc": "Enter the name of your MT Queue.",
+      "value": "ICCMT.fifo"
+    },
+    {
+      "name": "SQS MT Confirmation Queue Name",
+      "key": "sqs_mt_conf_name",
+      "desc": "Enter the name of your MT Confirmation Queue.",
+      "value": "ICCMTConfirmation.fifo"
+    },
+    {
+      "name": "SQS MT Error Queue Name",
+      "key": "sqs_mt_err_name",
+      "desc": "Enter the name of your MT Error Queue.",
+      "value": "ICCMTErrors.fifo"
+    }
+  ],
+  "services": [
+    {
+      "id": "625461581e6094100853d14e",
+      "name": "Iridium - MO Listener",
+      "key": "iridium-mo-listener",
+      "modelId": "81e139d106c65fba13f194bf",
+      "params": {
+        "access_key_id": "{{.access_key_id}}",
+        "operations": "send,receive",
+        "queue_url": "https://sqs.{{.region}}.amazonaws.com/{{.account_id}}/{{.sqs_mo_name}}",
+        "region": "{{.region}}",
+        "secret_key": "{{.secret_key}}"
+      }
+    },
+    {
+      "id": "625461581e6094100853d14f",
+      "name": "Iridium - MT Confirmation",
+      "key": "iridium-mt-confirmation",
+      "modelId": "81e139d106c65fba13f194bf",
+      "params": {
+        "access_key_id": "{{.access_key_id}}",
+        "operations": "send,receive",
+        "queue_url": "https://sqs.{{.region}}.amazonaws.com/{{.account_id}}/{{.sqs_mt_conf_name}}",
+        "region": "{{.region}}",
+        "secret_key": "{{.secret_key}}"
+      }
+    },
+    {
+      "id": "625461581e6094100853d150",
+      "name": "Iridium - MT Errors",
+      "key": "iridium-mt-errors",
+      "modelId": "81e139d106c65fba13f194bf",
+      "params": {
+        "access_key_id": "{{.access_key_id}}",
+        "operations": "send,receive",
+        "queue_url": "https://sqs.{{.region}}.amazonaws.com/{{.account_id}}/{{.sqs_mt_err_name}}",
+        "region": "{{.region}}",
+        "secret_key": "{{.secret_key}}"
+      },
+      "traceUntil": "2021-12-24T15:15:33.978Z"
+    },
+    {
+      "id": "625461581e6094100853d151",
+      "name": "Iridium - MT Sender",
+      "key": "iridium-mt-sender",
+      "modelId": "81e139d106c65fba13f194bf",
+      "params": {
+        "access_key_id": "{{.access_key_id}}",
+        "operations": "send",
+        "queue_url": "https://sqs.{{.region}}.amazonaws.com/{{.account_id}}/{{.sqs_mt_name}}",
+        "region": "{{.region}}",
+        "secret_key": "{{.secret_key}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "625461591e6094100853d155",
+      "name": "Iridium - Receive MO",
+      "type": "script",
+      "def": "var payloadIsString = false\r\n\r\nvar obj = Object.assign({}, event.data)\r\n\r\nif(payloadIsString) {\r\n    obj.payloadString = convert.binToStr(convert.hexToBin(event.data.payload))\r\n}\r\n\r\nlog.trace('iridium received mo', obj)\r\n",
+      "filterServiceId": "625461581e6094100853d14e",
+      "filterType": "aws-sqs-receive"
+    },
+    {
+      "id": "625461591e6094100853d157",
+      "name": "Iridium - Receive MT Confirmation",
+      "type": "script",
+      "def": "var obj = Object.assign({}, event.data.body)\r\nswitch(event.data.body.mt_message_status) {\r\n    case 0:\r\n        obj.status = 'Successful, no payload in message'\r\n        break\r\n    case -1:\r\n        obj.status = 'Invalid IMEI – too few characters, non-numeric characters'\r\n        break\r\n    case -2:\r\n        obj.status = 'Unknown IMEI – not provisioned on the Iridium Gateway'\r\n        break\r\n    case -3:\r\n        obj.status = 'Payload size exceeded maximum allowed (See Section 1.0)'\r\n        break\r\n    case -4:\r\n        obj.status = 'Payload expected, but none received'\r\n        break\r\n    case -5:\r\n        obj.status = 'MT message queue full (max of 50)'\r\n        break\r\n    case -6:\r\n        obj.status = 'MT resources unavailable'\r\n        break\r\n    case -7:\r\n        obj.status = 'Violation of MT DirectIP protocol error'\r\n        break\r\n    case -8:\r\n        obj.status = 'Ring alerts to the given IMEI are disabled'\r\n        break\r\n    case -9:\r\n        obj.status = 'The given IMEI is not attached (not set to receive ring alerts)'\r\n        break\r\n    case -10:\r\n        obj.status = 'Source IP address rejected by MT filter'\r\n        break\r\n    case -11:\r\n        obj.status = 'MTMSN value is out of range (valid range is 1 – 65,535)'\r\n        break\r\n    default:\r\n        obj.status = 'Successful'\r\n        obj.order = event.data.body.mt_message_status\r\n        break\r\n}\r\n\r\nlog.trace('iridium mt confirmation', obj)\r\n",
+      "filterServiceId": "625461581e6094100853d14f",
+      "filterType": "aws-sqs-receive"
+    },
+    {
+      "id": "625461591e6094100853d158",
+      "name": "Iridium - Receive MT Error",
+      "type": "script",
+      "def": "var obj = Object.assign({}, event.data.body)\r\nswitch(event.data.body.mt_message_status) {\r\n    case 0:\r\n        obj.status = 'Successful, no payload in message'\r\n        break\r\n    case -1:\r\n        obj.status = 'Invalid IMEI – too few characters, non-numeric characters'\r\n        break\r\n    case -2:\r\n        obj.status = 'Unknown IMEI – not provisioned on the Iridium Gateway'\r\n        break\r\n    case -3:\r\n        obj.status = 'Payload size exceeded maximum allowed (See Section 1.0)'\r\n        break\r\n    case -4:\r\n        obj.status = 'Payload expected, but none received'\r\n        break\r\n    case -5:\r\n        obj.status = 'MT message queue full (max of 50)'\r\n        break\r\n    case -6:\r\n        obj.status = 'MT resources unavailable'\r\n        break\r\n    case -7:\r\n        obj.status = 'Violation of MT DirectIP protocol error'\r\n        break\r\n    case -8:\r\n        obj.status = 'Ring alerts to the given IMEI are disabled'\r\n        break\r\n    case -9:\r\n        obj.status = 'The given IMEI is not attached (not set to receive ring alerts)'\r\n        break\r\n    case -10:\r\n        obj.status = 'Source IP address rejected by MT filter'\r\n        break\r\n    case -11:\r\n        obj.status = 'MTMSN value is out of range (valid range is 1 – 65,535)'\r\n        break\r\n    default:\r\n        obj.status = 'Successful'\r\n        obj.order = event.data.body.mt_message_status\r\n        break\r\n}\r\n\r\nlog.trace('iridium mt error', obj)",
+      "filterServiceId": "625461581e6094100853d150",
+      "filterType": "aws-sqs-receive"
+    },
+    {
+      "id": "625461591e6094100853d15a",
+      "name": "Iridium - Send MT Message",
+      "type": "script",
+      "def": "var obj = {}\r\nObject.assign(obj, event.data.data)\r\nif(obj.messageStr) {\r\n  obj.message = convert.binToHex(convert.strToBin(obj.message))\r\n  delete obj.messageStr\r\n}\r\n\r\naws_sqs.send('iridium-mt-sender',obj, {groupId:'deafult'})",
+      "filterType": "generic",
+      "filterGeneric": "iridium_mt",
+      "genericSample": "{\n \"client_message_id\" : 1234,\n \"message\" : \"mo link\",\n \"imei\" : \"300534062553780\"\n} "
+    }
+  ]
+}

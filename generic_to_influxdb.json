@@ -1,0 +1,50 @@
+{
+  "templateDef": [
+    {
+      "name": "InfluxDB server",
+      "key": "server",
+      "desc": "The URL for the influxdb server.",
+      "value": "http://<address>:8086"
+    },
+	{
+      "name": "Database name",
+      "key": "dbname",
+      "desc": "The name of the database.",
+      "value": "demo"
+    },
+	{
+      "name": "Metric name",
+      "key": "metric_name",
+      "desc": "The name of the metric to publish.",
+      "value": "demo"
+    }
+  ],
+  "services": [
+    {
+      "id": "5f5b9e49dfb509446ef1b741",
+      "name": "InfluxDB",
+      "key": "influxdb",
+      "modelId": "81f3b4b560a24e692418b239",
+      "params": {
+        "database": "{{.dbname}}",
+        "url": "{{.server}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "5f5b9e4adfb509446ef1b743",
+      "name": "Send to InfluxDB",
+      "version": 2,
+      "type": "script",
+      "def": "influxdb.publish('influxdb', {{.metric_name}}, {name: event.endpoint.name, key: event.endpoint.key}, event.data.data);",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "data"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+[
+  {
+    "leftImg": "/solutions/icons/semtech-edge.png",
+    "rightImg": "/solutions/icons/azure-iot-central.png",
+    "title": "LoRa Edge to Azure IoT Central",
+    "import": "/solutions/lorawan_semtech-edge_to_azure-iot-central.json",
+    "desc": "Integrate Semtech LoRa Edge Tracker to Azure IoT Central.",
+    "prereqs": [
+      "LoRa Edge Tracker",
+      "LNS Account",
+      "LoRa Cloud Account"
+    ],
+    "tags": [
+      "lora"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/lora-chirpstack.png",
+    "rightImg": "/solutions/icons/generic-cloud.png",
+    "title": "Chirpstack quickstart",
+    "import": "/solutions/lorawan_chirpstack_quickstart.json",
+    "desc": "Simple configuration of the Chirpstack LORA service, no decoders will be imported.",
+    "prereqs": [
+      "Chirpstack server with correctly configured application profile"
+    ],
+    "tags": [
+      "lora"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/lora-everynet.png",
+    "rightImg": "/solutions/icons/generic-cloud.png",
+    "title": "Everynet quickstart",
+    "import": "/solutions/lorawan_everynet_quickstart.json",
+    "desc": "Simple configuration of the Everynet LORA service, no decoders will be imported.",
+    "prereqs": [
+      "Everynet server with correctly configured application profile"
+    ],
+    "tags": [
+      "lora",
+      "everynet"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/lora-helium.png",
+    "rightImg": "/solutions/icons/generic-cloud.png",
+    "title": "Helium quickstart",
+    "import": "/solutions/lorawan_helium_quickstart.json",
+    "desc": "Simple configuration of the Helium LORA service, no decoders will be imported.",
+    "prereqs": [
+      "Helium server with correctly configured application profile"
+    ],
+    "tags": [
+      "lora"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/lora-loriot.png",
+    "rightImg": "/solutions/icons/generic-cloud.png",
+    "title": "Loriot quickstart",
+    "import": "/solutions/lorawan_loriot_quickstart.json",
+    "desc": "Simple configuration of the Loriot LORA service, no decoders will be imported.",
+    "prereqs": [
+      "Loriot server with correctly configured application profile"
+    ],
+    "tags": [
+      "lora"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/browan-object-locator.png",
+    "title": "Browan object locator decoder",
+    "import": "/solutions/lorawan_decode_browan.json",
+    "desc": "Decoder for Browan Object Locator devices.",
+    "prereqs": [
+      "LORA to Microsoft Azure IoT template"
+    ],
+    "tags": [
+      "lora",
+      "everynet"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/laird-sensor.png",
+    "title": "Laird sensor decoder",
+    "import": "/solutions/lorawan_decode_laird.json",
+    "desc": "Decoder for Laird LORA sensors.",
+    "prereqs": [
+      "LORA to Microsoft Azure IoT template"
+    ],
+    "tags": [
+      "lora",
+      "everynet"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/rak-7200.png",
+    "title": "RAK7200 sensor decoder",
+    "import": "/solutions/lorawan_decode_rak-7200.json",
+    "desc": "Decoder for RAK7200 LORA sensors.",
+    "prereqs": [
+      "LORA to Microsoft Azure IoT template"
+    ],
+    "tags": [
+      "lora",
+      "everynet"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/rak-7201.png",
+    "title": "RAK7201 sensor decoder",
+    "import": "/solutions/lorawan_decode_rak-7201.json",
+    "desc": "Decoder for RAK7201 LORA sensors.",
+    "prereqs": [
+      "LORA to Microsoft Azure IoT template"
+    ],
+    "tags": [
+      "lora",
+      "everynet"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/tektelic-agriculture.png",
+    "title": "Tektelic agriculture decoder",
+    "import": "/solutions/lorawan_decode_tektelic_agro.json",
+    "desc": "Decoder for Tektelic agriculture sensor devices.",
+    "prereqs": [
+      "LORA to Microsoft Azure IoT template"
+    ],
+    "tags": [
+      "lora",
+      "everynet"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/lora.png",
+    "rightImg": "/solutions/icons/azure-iot.png",
+    "title": "LORA to Azure IoT Hub",
+    "import": "/solutions/lorawan_to_azure-iot.json",
+    "desc": "Basic framework for LORA to Azure IoT Hub.",
+    "prereqs": [
+      "IoT Hub and service account connection string",
+      "LORA Network Server template imported"
+    ],
+    "tags": [
+      "lora",
+      "azure",
+      "everynet"
+    ]
+  }
+]

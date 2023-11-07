@@ -1,0 +1,94 @@
+[
+  {
+    "leftImg": "/solutions/icons/micron-logo.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "Micron Decoder",
+    "import": "/solutions/micron_decoder.json",
+    "desc": "Create listener for Micron devices.",
+    "prereqs": [
+      "Micron device"
+    ],
+    "tags": [
+      "micron"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/micron-logo.png",
+    "rightImg": "/solutions/icons/azure-iot.png",
+    "title": "Micron to Azure IoT Hub",
+    "import": "/solutions/micron_to_azure-iot.json",
+    "desc": "Integrate Micron devices quickly to Azure IoT Hub.",
+    "prereqs": [
+      "Import 'Micron Decoder' template",
+      "IoT Hub and service account connection string",
+      "Micron device"
+    ],
+    "tags": [
+      "micron",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/micron-logo.png",
+    "rightImg": "/solutions/icons/azure-iot-central.png",
+    "title": "Micron to Azure IoT Central",
+    "import": "/solutions/micron_to_azure-iot-central.json",
+    "desc": "Integrate Micron devices quickly to Azure IoT Central.",
+    "prereqs": [
+      "Import 'Micron Decoder' template",
+      "IoT Central account",
+      "Micron device"
+    ],
+    "tags": [
+      "micron",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/micron-logo.png",
+    "rightImg": "/solutions/icons/azure-digital-twins.png",
+    "title": "Micron to Azure Digital Twins",
+    "import": "/solutions/micron_to_azure-twin.json",
+    "desc": "Integrate Micron devices quickly to Azure Digital Twin.",
+    "prereqs": [
+      "Import 'Micron Decoder' template",
+      "ADT instance with an Event Hub",
+      "Micron device"
+    ],
+    "tags": [
+      "micron",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/micron-logo.png",
+    "rightImg": "/solutions/icons/track.png",
+    "title": "Publish Micron events to Track",
+    "import": "/solutions/micron_to_track.json",
+    "desc": "Publish Micron events to Tartabit Track.",
+    "prereqs": [
+      "Import 'Micron Decoder' template",
+      "Micron device"
+    ],
+    "tags": [
+      "micron",
+      "track"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/micron-logo.png",
+    "rightImg": "/solutions/icons/generic-webhook.png",
+    "title": "Send Micron events to a webhook",
+    "import": "/solutions/micron_to_webhook.json",
+    "desc": "Publish reports to an HTTP(S) webhook.",
+    "prereqs": [
+      "Import 'Micron Decoder' template",
+      "Micron device",
+      "HTTP server to receive reports"
+    ],
+    "tags": [
+      "micron",
+      "webhook"
+    ]
+  }
+]

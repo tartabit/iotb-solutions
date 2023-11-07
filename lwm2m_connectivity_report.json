@@ -1,0 +1,144 @@
+{
+  "triggers": [
+    {
+      "id": "61b3a2d7caf770c1246ea92e",
+      "name": "LWM2M - Publish Connectivity Report (Obj 3)",
+      "type": "script",
+      "def": "var values = {}\r\n\r\nif(event.data.data.device_3) {\r\n    var inst = event.data.data.device_3['0']\r\n    values.manufacturer = inst.manufacturer_0\r\n    values.model = inst.model_number_1\r\n}\r\n\r\n report.publish('lwm2m-connectivity',event.endpoint.key,event.ts,{name: event.endpoint.name, values:values})\r\n",
+      "filterType": "lwm2m-data",
+      "filterCustom": {
+        "data.device_3": {
+          "comp": "exists",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "61b2d135469d86b7ceaadf12",
+      "name": "LWM2M - Publish Connectivity Report (Obj 4)",
+      "type": "script",
+      "def": "var values = {}\r\n\r\nif(event.data.data.connectivity_monitoring_4) {\r\n    var inst = event.data.data.connectivity_monitoring_4['0']\r\n    values.bearer = inst.network_bearer_0\r\n    values.rssi = inst.radio_signal_strength_2\r\n    try {\r\n        var obj = convert.mccmnc(inst.smcc_10,inst.smnc_9)\r\n        values.country = obj.country\r\n        values.operator = obj.operator\r\n    } catch(e) {\r\n        //do nothing\r\n    }\r\n}\r\n\r\n report.publish('lwm2m-connectivity',event.endpoint.key,event.ts,{name: event.endpoint.name, values:values})\r\n",
+      "filterType": "lwm2m-data",
+      "filterCustom": {
+        "data.connectivity_monitoring_4": {
+          "comp": "exists",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "61b3b8cce6eff0c9d4dbf78d",
+      "name": "LWM2M - Read on register for Connectivity Report",
+      "type": "script",
+      "def": "lwm2m.read(event.endpoint.key, ['3/0','4/0'])",
+      "filterType": "lwm2m-register"
+    }
+  ],
+  "reports": [
+    {
+      "fields": [
+        {
+          "aggregations": [
+            {
+              "name": "Devices by Operator",
+              "type": "terms"
+            }
+          ],
+          "key": "operator",
+          "name": "Operator",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "aggregations": [
+            {
+              "name": "Devices by Country",
+              "type": "terms"
+            }
+          ],
+          "key": "country",
+          "name": "Country",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "aggregations": [
+            {
+              "name": "Devices by Bearer",
+              "pivot": "operator",
+              "type": "terms"
+            }
+          ],
+          "key": "bearer",
+          "name": "Bearer",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "aggregations": [
+            {
+              "name": "RSSI",
+              "range": [
+                {
+                  "key": "very-bad",
+                  "to": -110
+                },
+                {
+                  "from": -110,
+                  "key": "bad",
+                  "to": -100
+                },
+                {
+                  "from": -100,
+                  "key": "ok",
+                  "to": -90
+                },
+                {
+                  "from": -90,
+                  "key": "good",
+                  "to": -80
+                },
+                {
+                  "from": -80,
+                  "key": "excellent"
+                }
+              ],
+              "type": "range"
+            }
+          ],
+          "key": "rssi",
+          "name": "RSSI",
+          "required": false,
+          "type": "number"
+        },
+        {
+          "aggregations": [
+            {
+              "name": "Devices by Manufacturer",
+              "type": "terms"
+            }
+          ],
+          "key": "manufacturer",
+          "name": "Manufacturer",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "aggregations": [
+            {
+              "name": "Devices by Model",
+              "type": "terms"
+            }
+          ],
+          "key": "model",
+          "name": "Model",
+          "required": false,
+          "type": "string"
+        }
+      ],
+      "id": "61b2cf9d6c2eb2215c31b6de",
+      "key": "lwm2m-connectivity",
+      "name": "LWM2M - Connectivity Report"
+    }
+  ]
+}

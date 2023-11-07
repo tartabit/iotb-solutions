@@ -1,0 +1,154 @@
+{
+  "endpoints": null,
+  "services": [
+    {
+      "id": "635831650a467cc6a48dce03",
+      "name": "LWM2M",
+      "key": "lwm2m",
+      "modelId": "8162da7fee748d33d09ab7c1",
+      "params": {
+        "autogen_enabled": "false",
+        "autogen_thumbprint": "false",
+        "bootstrap_lifetime": "120",
+        "coap_ack_random_factor": "1.5",
+        "coap_ack_timeout": "5",
+        "coap_blocksize": "1024",
+        "coap_max_retransmit": "3",
+        "coap_nstart": "10",
+        "force_queue_mode": "false",
+        "retain_queue_on_register": "false"
+      }
+    },
+    {
+      "id": "6358349b9fd03c3391d43130",
+      "name": "Report",
+      "key": "report",
+      "modelId": "81b90f9f768aa772b6f09ed8"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "6375356d65916cf12d23a028",
+      "name": "Validate Writes",
+      "type": "script",
+      "def": "\r\n\r\nvar key = cache.get(\"validate-target\")\r\nvar stringResource = event.data.data.stringResource\r\nvar integerResource = event.data.data.integerResource\r\nvar booleanResource = event.data.data.booleanResource\r\nvar opaqueResource = event.data.data.opaqueResource\r\nvar checkTlv = event.data.data.checkTlv\r\nvar checkSenMlCbor = event.data.data.checkSenMlCbor\r\nvar checkText = event.data.data.checkText\r\nvar checkOpaque = event.data.data.checkOpaque\r\n\r\nvar idFormat = 'numbers'\r\n\r\nfunction testWriteString(encoding) {\r\n    if(!stringResource) {\r\n        return\r\n    }\r\n    try {\r\n        var testString = random.string(8)\r\n        lwm2m.write(key, stringResource, testString, { translateIds: idFormat, encoding: encoding, async: false })\r\n        var returnValue = lwm2m.read(key, stringResource, { encoding: encoding, async: false, return: 'value' })\r\n        if (!returnValue || returnValue.value != testString) {\r\n            report.publish('validate-results-' + key, 'write-resource-string-' + encoding, event.ts, { values: { error: \"read validation failed\" } })\r\n        } else {\r\n            report.publish('validate-results-' + key, 'write-resource-string-' + encoding, event.ts, { values: { data: \"write successful\", error: \"\" } })\r\n        }\r\n    } catch (e) {\r\n        report.publish('validate-results-' + key, 'write-resource-string-' + encoding, event.ts, { values: { error: e.message } })\r\n    }\r\n}\r\n\r\nfunction testWriteInteger(encoding) {\r\n    if(!integerResource) {\r\n        return\r\n    }\r\n    try {\r\n        var testInteger = random.integer(1, 1000)\r\n        lwm2m.write(key, integerResource, testInteger, { translateIds: idFormat, encoding: encoding, async: false })\r\n        var returnValue = lwm2m.read(key, integerResource, { encoding: encoding, async: false, return: 'value' })\r\n        if (!returnValue || returnValue.value != testInteger) {\r\n            report.publish('validate-results-' + key, 'write-resource-integer-' + encoding, event.ts, { values: { error: \"read validation failed\" } })\r\n        } else {\r\n            report.publish('validate-results-' + key, 'write-resource-integer-' + encoding, event.ts, { values: { data: \"write successful\", error: \"\" } })\r\n        }\r\n    } catch (e) {\r\n        report.publish('validate-results-' + key, 'write-resource-integer-' + encoding, event.ts, { values: { error: e.message } })\r\n    }\r\n}\r\n\r\nfunction testWriteBoolean(encoding) {\r\n    if(!booleanResource) {\r\n        return\r\n    }\r\n    try {\r\n        var returnValue = lwm2m.read(key, booleanResource, { encoding: encoding, async: false, return: 'value' })\r\n        if (returnValue) {\r\n            var testBoolean = !returnValue.value\r\n            lwm2m.write(key, booleanResource, testBoolean, { translateIds: idFormat, encoding: encoding, async: false })\r\n            returnValue = lwm2m.read(key, booleanResource, { encoding: encoding, async: false, return: 'value' })\r\n            if (!returnValue || returnValue.value != testBoolean) {\r\n                report.publish('validate-results-' + key, 'write-resource-boolean-' + encoding, event.ts, { values: { error: \"read validation failed\" } })\r\n            } else {\r\n                report.publish('validate-results-' + key, 'write-resource-boolean-' + encoding, event.ts, { values: { data: \"write successful\", error: \"\" } })\r\n            }\r\n        } else {\r\n            report.publish('validate-results-' + key, 'write-resource-boolean-' + encoding, event.ts, { values: { error: \"read initial value failed\" } })\r\n        }\r\n    } catch (e) {\r\n        report.publish('validate-results-' + key, 'write-resource-boolean-' + encoding, event.ts, { values: { error: e.message } })\r\n    }\r\n}\r\n\r\nfunction testWriteOpaque(encoding) {\r\n    if(!opaqueResource) {\r\n        return\r\n    }\r\n    try {\r\n        var testHex = random.hex(16)\r\n        var testBin = convert.hexToBin(testHex)\r\n        lwm2m.write(key, opaqueResource, testBin, { translateIds: idFormat, encoding: encoding, async: false })\r\n        var returnValue = lwm2m.read(key, opaqueResource, { encoding: encoding, async: false, return: 'value' })\r\n        if (!returnValue || returnValue.value.toLowerCase() != testHex.toLowerCase()) {\r\n            report.publish('validate-results-' + key, 'write-resource-opaque-' + encoding, event.ts, { values: { error: \"read validation failed\" } })\r\n        } else {\r\n            report.publish('validate-results-' + key, 'write-resource-opaque-' + encoding, event.ts, { values: { data: \"write successful\", error: \"\" } })\r\n        }\r\n    } catch (e) {\r\n        report.publish('validate-results-' + key, 'write-resource-opaque-' + encoding, event.ts, { values: { error: e.message } })\r\n    }\r\n}\r\n\r\nif (checkTlv) {\r\n    testWriteString('tlv')\r\n    testWriteInteger('tlv')\r\n    testWriteBoolean('tlv')\r\n    testWriteOpaque('tlv')\r\n}\r\nif (checkSenMlCbor) {\r\n    testWriteString('senml_cbor')\r\n    testWriteInteger('senml_cbor')\r\n    testWriteBoolean('senml_cbor')\r\n    testWriteOpaque('senml_cbor')\r\n}\r\nif (checkText) {\r\n    testWriteString('text')\r\n    testWriteInteger('text')\r\n    testWriteBoolean('text')\r\n}\r\n\r\ntrigger.reply({})",
+      "filterType": "generic",
+      "filterGeneric": "validate-writes",
+      "genericSample": "{\n  \"stringResource\":\"3/0/15\",\n  \"integerResource\":\"1/0/1\",\n  \"booleanResource\":\"1/0/6\",\n  \"opaqueResource\":\"3442/0/150\",\n  \"checkTlv\": true,\n  \"checkSenMlCbor\": true,\n  \"checkText\":true\n}"
+    },
+    {
+      "id": "6375090265916cf12d239a20",
+      "name": "Validate Updates",
+      "type": "script",
+      "def": "report.publish('validate-results-'+event.endpoint.key, 'update', event.ts, { values: { data: JSON.stringify({remoteAddr: event.data.remoteAddr, session: event.data.session}) } })\r\n",
+      "filterType": "lwm2m-update"
+    },
+    {
+      "id": "63750f1c65916cf12d239c56",
+      "name": "Validate Send",
+      "type": "script",
+      "def": "report.publish('validate-results-'+event.endpoint.key,'send-received', event.ts, { values: { data: JSON.stringify(event.data.data), error:\"\" }})",
+      "filterType": "lwm2m-data",
+      "filterCustom": {
+        "source": {
+          "comp": "eq",
+          "value": "send"
+        }
+      }
+    },
+    {
+      "id": "6358343f4d63a8ac90588ef4",
+      "name": "Validate Registration",
+      "type": "script",
+      "def": "var discovery = Object.assign({}, event.data.discovery)\r\nvar discoveryRaw = discovery.attributes.raw\r\ndelete discovery.attributes.raw\r\n\r\nreport.clone('validate-results', 'validate-results-' + event.endpoint.key, 'Validate ' + event.endpoint.name)\r\nreport.publish('validate-results-' + event.endpoint.key, 'discovery', event.ts, { values: { data: JSON.stringify(discovery) } })\r\nreport.publish('validate-results-' + event.endpoint.key, 'discovery-raw', event.ts, { values: { data: discoveryRaw } })\r\nreport.publish('validate-results-' + event.endpoint.key, 'version', event.ts, { values: { data: event.data.version } })\r\nreport.publish('validate-results-' + event.endpoint.key, 'registration', event.ts, { values: { data: JSON.stringify({ remoteAddr: event.data.remoteAddr, session: event.data.session }) } })\r\n\r\ncache.set(\"validate-target\", event.endpoint.key)\r\ncache.set(\"validate-discovery\", JSON.stringify(discovery))",
+      "filterType": "lwm2m-register"
+    },
+    {
+      "id": "6375011965916cf12d2394a8",
+      "name": "Validate Reads",
+      "type": "script",
+      "def": "\r\n\r\nvar key = cache.get(\"validate-target\")\r\nvar checkTlv = event.data.data.checkTlv\r\nvar checkSenMlCbor = event.data.data.checkSenMlCbor\r\nvar checkOpaque = event.data.data.checkOpaque\r\nvar checkResources = event.data.data.checkResources\r\nvar discovery = JSON.parse(cache.get(\"validate-discovery\"))\r\n\r\n// configures the naming used for variables in the telemetry and twin\r\n// combined - device_3.0.manufacturer_0\r\n// strings - device.0.manufacturer\r\n// numbers - 3.0.0\r\nvar idFormat = 'numbers'\r\n\r\nvar reads = [];\r\nvar obs = [];\r\nvar obj;\r\n\r\nfor (obj in discovery.children) {\r\n\r\n    var child = discovery.children[obj]\r\n    if (child.children) {\r\n        var inst;\r\n        for (inst in child.children) {\r\n            // check reads\r\n            if (checkTlv) {\r\n                try {\r\n                    var data = lwm2m.read(key, [obj + '/' + inst], { translateIds: idFormat, encoding: 'tlv', composite: false, async: false })\r\n                    report.publish('validate-results-' + key, 'read-instance-' + obj + '-' + inst + '-tlv', event.ts, { values: { data: JSON.stringify(data), error: \"\" } })\r\n                } catch (e) {\r\n                    report.publish('validate-results-' + key, 'read-instance-' + obj + '-' + inst + '-tlv', event.ts, { values: { error: e.message } })\r\n                }\r\n\r\n            }\r\n            if (checkSenMlCbor) {\r\n                try {\r\n                    var data = lwm2m.read(key, [obj + '/' + inst], { translateIds: idFormat, encoding: 'senml_cbor', composite: false, async: false })\r\n                    report.publish('validate-results-' + key, 'read-instance-' + obj + '-' + inst + '-senml_cbor', event.ts, { values: { data: JSON.stringify(data), error: \"\" } })\r\n                } catch (e) {\r\n                    report.publish('validate-results-' + key, 'read-instance-' + obj + '-' + inst + '-senml_cbor', event.ts, { values: { error: e.message } })\r\n                }\r\n            }\r\n            if (checkResources) {\r\n                var objDef = lwm2m.getObjectDef(obj)\r\n                objDef.resources.forEach(function (res) {\r\n                    if (res.allowRead) {\r\n                        if (checkTlv) {\r\n                            try {\r\n                                var data = lwm2m.read(key, [obj + '/' + inst + '/' + res.id], { translateIds: idFormat, encoding: 'tlv', composite: false, async: false })\r\n                                report.publish('validate-results-' + key, 'read-resource-' + obj + '-' + inst + '-' + res.id + '-tlv', event.ts, { values: { data: JSON.stringify({ name: res.name, value: data[obj][inst][res.id] }), error: \"\" } })\r\n                            } catch (e) {\r\n                                report.publish('validate-results-' + key, 'read-resource-' + obj + '-' + inst + '-' + res.id + '-tlv', event.ts, { values: { error: e.message } })\r\n                            }\r\n                        }\r\n                        if (checkOpaque && res.type == \"Opaque\" && !res.multiInstance) {\r\n                            try {\r\n                                var data = lwm2m.read(key, [obj + '/' + inst + '/' + res.id], { translateIds: idFormat, encoding: 'opaque', composite: false, async: false })\r\n                                report.publish('validate-results-' + key, 'read-resource-' + obj + '-' + inst + '-' + res.id + '-opaque', event.ts, { values: { data: JSON.stringify({ name: res.name, value: data[obj][inst][res.id] }), error: \"\" } })\r\n                            } catch (e) {\r\n                                report.publish('validate-results-' + key, 'read-resource-' + obj + '-' + inst + '-' + res.id + '-opaque', event.ts, { values: { error: e.message } })\r\n                            }\r\n                        }\r\n                    }\r\n\r\n                })\r\n            }\r\n\r\n        }\r\n    }\r\n}\r\n\r\ntrigger.reply({})\r\n",
+      "filterType": "generic",
+      "filterGeneric": "validate-reads",
+      "genericSample": "{\n  \"checkTlv\": true,\n  \"checkSenMlCbor\": true,\n  \"checkOpaque\": true,\n  \"checkResources\": true\n}"
+    },
+    {
+      "id": "6375062d65916cf12d239884",
+      "name": "Validate Observations",
+      "type": "script",
+      "def": "\r\n\r\nvar key = cache.get(\"validate-target\")\r\nvar checkTlv = event.data.data.checkTlv\r\nvar checkSenMlCbor = event.data.data.checkSenMlCbor\r\nvar testInstance = event.data.data.testInstance\r\nvar testResource = event.data.data.testResource\r\n\r\nvar idFormat = 'numbers'\r\n\r\nif (checkTlv) {\r\n    lwm2m.observe(key, [testInstance], { translateIds:idFormat, encoding:'tlv', context: {encoding:'tlv', test:'instance'} })\r\n    lwm2m.observe(key, [testResource], { translateIds:idFormat, encoding:'tlv', context: {encoding:'tlv', test:'resource'} })\r\n    report.publish('validate-results-' + key, 'observe-instance-tlv', event.ts, { values: { error:\"no data received\" } })\r\n    report.publish('validate-results-' + key, 'observe-resource-tlv', event.ts, { values: { error:\"no data received\" } })\r\n}\r\n\r\nif (checkSenMlCbor) {\r\n    lwm2m.observe(key, [testInstance], { translateIds:idFormat, encoding: 'senml_cbor', context: {encoding:'senml_cbor', test:'instance' } })\r\n    lwm2m.observe(key, [testResource], { translateIds:idFormat, encoding: 'senml_cbor', context: {encoding:'senml_cbor', test:'resource'} })\r\n    report.publish('validate-results-' + key, 'observe-instance-senml_cbor', event.ts, { values: { error:\"no data received\" } })\r\n    report.publish('validate-results-' + key, 'observe-resource-senml_cbor', event.ts, { values: { error:\"no data received\" } })\r\n}\r\n\r\ntrigger.reply({})",
+      "filterType": "generic",
+      "filterGeneric": "validate-observations",
+      "genericSample": "{\n  \"checkTlv\": true,\n  \"checkSenMlCbor\": true,\n  \"testInstance\": \"3/0\",\n  \"testResource\":\"3/0/13\"\n}"
+    },
+    {
+      "id": "6375066265916cf12d239890",
+      "name": "Validate Observation Notifications",
+      "type": "script",
+      "def": "report.publish('validate-results-'+event.endpoint.key,'observe-'+event.data.context.test+'-'+event.data.context.encoding, event.ts, { values: { data: JSON.stringify(event.data.data), error:\"\" }})",
+      "filterType": "lwm2m-data",
+      "filterCustom": {
+        "source": {
+          "comp": "eq",
+          "value": "notify"
+        }
+      }
+    },
+    {
+      "id": "63754a5965916cf12d23a5c1",
+      "name": "Client Validate Leshan",
+      "type": "script",
+      "def": "var readConfig = {\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  checkOpaque: true,\r\n  checkResources: true\r\n}\r\nexec.sync('validate-reads',readConfig,30)\r\n\r\nvar obsConfig = {\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  testInstance: \"3/0\",\r\n  testResource:\"3/0/13\"\r\n}\r\nexec.sync('validate-observations',obsConfig,30)\r\n\r\nvar writeConfig = {\r\n  stringResource:\"3/0/15\",\r\n  integerResource:\"1/0/1\",\r\n  booleanResource:\"1/0/6\",\r\n  opaqueResource:\"3442/0/150\",\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  checkText:true\r\n}\r\nexec.sync('validate-writes',writeConfig,30)\r\n",
+      "filterType": "generic",
+      "filterGeneric": "validate-leshan",
+      "genericSample": "{}"
+    },
+    {
+      "id": "637553aa65916cf12d23b5ca",
+      "name": "Client Validate IOWA",
+      "type": "script",
+      "def": "var readConfig = {\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  checkOpaque: true,\r\n  checkResources: true\r\n}\r\nexec.sync('validate-reads',readConfig,30)\r\n\r\nvar obsConfig = {\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  testInstance: \"3/0\",\r\n  testResource:\"3/0/13\"\r\n}\r\nexec.sync('validate-observations',obsConfig,30)\r\n\r\nvar writeConfig = {\r\n  stringResource:\"3/0/15\",\r\n  integerResource:\"1/0/1\",\r\n  booleanResource:\"1/0/6\",\r\n//  opaqueResource:\"3442/0/150\",\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  checkText:true\r\n}\r\nexec.sync('validate-writes',writeConfig,30)\r\n",
+      "filterType": "generic",
+      "filterGeneric": "validate-iowa",
+      "genericSample": "{}"
+    },
+    {
+      "id": "63754c8e65916cf12d23a968",
+      "name": "Client Validate Anjay",
+      "type": "script",
+      "def": "var readConfig = {\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  checkOpaque: true,\r\n  checkResources: true\r\n}\r\nexec.sync('validate-reads',readConfig,30)\r\n\r\nvar obsConfig = {\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  testInstance: \"3/0\",\r\n  testResource:\"3/0/13\"\r\n}\r\nexec.sync('validate-observations',obsConfig,30)\r\n\r\nvar writeConfig = {\r\n  stringResource:\"3/0/15\",\r\n  integerResource:\"1/1/1\",\r\n  booleanResource:\"1/1/6\",\r\n//  opaqueResource:\"3442/0/150\",\r\n  checkTlv: true,\r\n  checkSenMlCbor: true,\r\n  checkText:true\r\n}\r\nexec.sync('validate-writes',writeConfig,30)\r\n",
+      "filterType": "generic",
+      "filterGeneric": "validate-anjay",
+      "genericSample": "{}"
+    }
+  ],
+  "lwm2mObjDefs": null,
+  "reports": [
+    {
+      "fields": [
+        {
+          "key": "data",
+          "name": "data",
+          "required": false,
+          "type": "string"
+        },
+        {
+		  "aggregations": [
+            {
+              "name": "Errors by Type",
+              "type": "terms"
+            }
+          ],
+          "key": "error",
+          "name": "error",
+          "required": false,
+          "type": "string"
+        }
+      ],
+      "id": "6358349b9fd03c3391d4312f",
+      "key": "validate-results",
+      "name": "Validate Results",
+      "records": 0
+    }
+  ]
+}

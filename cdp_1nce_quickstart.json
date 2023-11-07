@@ -1,0 +1,44 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    },
+    {
+      "name": "Webhook",
+      "key": "webhook",
+      "desc": "The webhook secret to for data stream publishes.",
+      "value": "abc123",
+      "genString": 32
+    },
+    {
+      "name": "1NCE API Username",
+      "key": "api_user",
+      "desc": "The lifetime to configure if the device bootstraps.",
+      "value": ""
+    },
+    {
+      "name": "1NCE API Password",
+      "key": "api_pass",
+      "desc": "The lifetime to configure if the device bootstraps.",
+      "value": ""
+    }
+  ],
+  "services": [
+    {
+      "id": "641db53e4d8fc7b4a8038396",
+      "name": "1NCE Connector ({{.prefix}})",
+      "key": "{{.prefix}}-1nce",
+      "modelId": "81b586fc64a1db62782ac7d6",
+      "params": {
+        "api_password": "{{.api_pass}}",
+        "api_user": "{{.api_user}}",
+        "endpoint_lookup": "none",
+        "target_sync_hour": "8",
+        "webhook": "{{.webhook}}"
+      }
+    }
+  ]
+}

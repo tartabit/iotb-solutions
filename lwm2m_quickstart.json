@@ -1,0 +1,53 @@
+{
+  "templateDef": [
+    {
+      "name": "LWM2M lifetime",
+      "key": "lifetime",
+      "desc": "The lifetime to configure if the device bootstraps.",
+      "value": "60"
+    }
+  ],
+  "services": [
+    {
+      "id": "5f5fa8033590c0ad2c7d229d",
+      "name": "LWM2M Server",
+      "key": "lwm2m",
+      "modelId": "8162da7fee748d33d09ab7c1",
+      "params": {
+        "bootstrap_lifetime": "{{.lifetime}}",
+        "coap_retransmit_count": "3",
+        "coap_retransmit_timeout": "5",
+        "coap_blocksize": "1024"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "6206c7fdec6a2b6be72d9c8f",
+      "name": "LWM2M - On Registration",
+      "type": "script",
+      "def": "/* Key features of this trigger:\n  - reads all object instances (except the IPSO/standard objects range 3000-4000)\n  - observes all object instances in the IPSO/standard range\n  - if 6/0 (location) is present, it will be observed as well\n*/\n\n// set to false if the device does not support observations.  The \"On Update\" trigger should be updated as well to read on-demand.\nvar useObserves = true\n\n// set to true to use composite read/observe\nvar useComposites = false\n// if your 1.1 client does not support composites, comment this out.\n//if(event.data.version && event.data.version==='1.1') {\n//    useComposites = true\n//}\n\n// configures the naming used for variables in the telemetry and twin\n// combined - device_3.0.manufacturer_0\n// strings - device.0.manufacturer\n// numbers - 3.0.0\nvar idFormat = 'combined'\n\n// set the following values to configure communications\nvar lifetime = 120\nvar pmin = 60\nvar pmax = 300\n\nvar serverInstance = '0'\n\nif (event.data.discovery) {\n    var reads = [];\n    var obs = [];\n    var obj;\n\n    if (pmin && event.data.discovery.children['1']) {\n        var keys = Object.keys(event.data.discovery.children['1'].children)\n        if (keys.length > 0) {\n            serverInstance = keys[0]\n        }\n    }\n\n    for (obj in event.data.discovery.children) {\n        var child = event.data.discovery.children[obj]\n        if (child.children) {\n            var inst;\n            for (inst in child.children) {\n                if (useObserves && obj == 6 && inst == 0) {\n                    obs.push('/'+obj + '/' + inst)\n                } else if (useObserves && obj > 3000 && obj < 4000) {\n                    obs.push('/'+obj + '/' + inst)\n                } else {\n                    reads.push('/'+obj + '/' + inst)\n                }\n            }\n        }\n    }\n\n    // read object instances that aren't observed\n    lwm2m.read(event.endpoint.key, reads, { translateIds: idFormat, composite: useComposites })\n\n    // uncomment the following to adjust the pmin for each observation to control publish rate\n    //obs.forEach( function(obsInst) {\n    //  lwm2m.writeAttrs(event.endpoint.key,obsInst,{pmin:30, st: 0.5})\n    //})\n\n    if (useObserves) {\n\n        if(lifetime && pmin && pmax) {\n            lwm2m.write(event.endpoint.key, '1/'+serverInstance, {1: lifetime, 2: pmin, 3: pmax})\n        }\n\n        // observe objects 3000-4000 & 6\n        lwm2m.observe(event.endpoint.key, obs, { translateIds: idFormat, composite: useComposites })\n    }\n}\n",
+      "filterType": "lwm2m-register"
+    },
+    {
+      "id": "6206c7fdec6a2b6be72d9c90",
+      "name": "LWM2M - On Update",
+      "type": "script",
+      "def": "// configures the naming used for variables in the telemetry and twin\n// combined - device_3.0.manufacturer_0\n// strings - device.0.manufacturer\n// numbers - 3.0.0\nvar idFormat = 'combined'\n\n// set to true to read all object instances on each update, this is useful if your device does not support observations\nvar readAll = false\n\n/* On update, this trigger will read object 4 to check connectivity information. */\nif(event.data.discovery && event.data.discovery.children['4']) {\n    lwm2m.read(event.endpoint.key,['4/0'], {translateIds: idFormat})\n}\n\nif(readAll && event.data.discovery) {\n  var reads = [];\n  var obj;\n  for(obj in event.data.discovery.children) {\n    var child = event.data.discovery.children[obj]\n    if(child.children) {\n      var inst;\n      for(inst in child.children) {\n        reads.push(obj+'/'+inst)\n      }\n    }\n  }\n\n  lwm2m.read(event.endpoint.key,reads, {translateIds: idFormat})\n\n}",
+      "filterType": "lwm2m-update"
+    },
+    {
+      "id": "6206c7fdec6a2b6be72d9c92",
+      "name": "LWM2M - Flatten device data",
+      "type": "script",
+      "def": "// if data comes in combined mode, this will trim the ID off the end of the string for readability\r\nvar trimIds = true\r\n\r\nvar model = {  \r\n  ts: event.ts,\r\n  location: {},\r\n  values: {}\r\n}\r\n\r\nif(event.data.data.location_6) {\r\n  var loc = event.data.data.location_6['0']\r\n  model.location = {lat: loc.latitude_0, lon: loc.longitude_1 }\r\n}\r\n\r\nvar objName = ''\r\nvar objTrackName = ''\r\nfor(objName in event.data.data) {\r\n    objTrackName = objName\r\n    if(isNaN(objName)) {\r\n        var tail = objName.lastIndexOf('_')\r\n        var objNum = objName.substring(tail+1)\r\n        if(!isNaN(objNum && trimIds)) {\r\n          objTrackName = objName.substring(0, tail)\r\n        }\r\n    }\r\n\r\n    if(Object.keys(event.data.data[objName]).length===1) {\r\n        var inst = event.data.data[objName]['0']\r\n        // single instance\r\n        var resName = ''\r\n        var resTrackName = ''\r\n        for(resName in inst) {\r\n            resTrackName = resName\r\n            if(isNaN(resName)) {\r\n              var tail = resName.lastIndexOf('_')\r\n              var resNum = resName.substring(tail+1)\r\n              if(!isNaN(resNum && trimIds)) {\r\n                resTrackName = resName.substring(0, tail)\r\n              }\r\n            }\r\n\r\n            if(typeof inst[resName] === 'object' || Array.isArray(inst[resName])) {\r\n                // do nothing\r\n            } else {\r\n              model.values[objTrackName+'_'+resTrackName] = inst[resName]\r\n            }\r\n        }\r\n    }\r\n}\r\nexec.now('lwm2m-simple-data', model);",
+      "filterType": "lwm2m-data",
+      "filterCustom": {
+        "data.translateIds": {
+          "comp": "ne",
+          "value": "numbers"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "templateDef": [
+    {
+      "name": "LWM2M endpoint",
+      "key": "endpoint",
+      "desc": "The LWM2M endpoint.",
+      "value": "test_device",
+      "genStringLc": 16
+    },
+    {
+      "name": "LWM2M identity",
+      "key": "identity",
+      "desc": "The LWM2M identity, must be a string.",
+      "value": "test_device",
+      "genString": 16
+    },
+    {
+      "name": "LWM2M Pre-shared key",
+      "key": "psk",
+      "desc": "Pre-shared key as hex encoded string.",
+      "value": "11223344556677889900",
+      "genHex": 16
+    },
+    {
+      "name": "LWM2M Service",
+      "key": "service",
+      "desc": "Select a previously defined LWM2M service.",
+      "findService": "8162da7fee748d33d09ab7c1"
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "62ab596723ad706e7533ef41",
+      "serviceId": "{{.service}}",
+      "name": "STMicro U5 ({{.endpoint}})",
+      "key": "st-{{.endpoint}}",
+      "params": {
+        "endpoint": "{{.endpoint}}",
+        "identity": "{{.identity}}",
+        "psk": "{{.psk}}"
+      }
+    }
+  ]
+}

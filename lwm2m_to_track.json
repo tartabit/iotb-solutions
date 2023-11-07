@@ -1,0 +1,27 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    }
+  ],
+  "services": [
+    {
+      "id": "61a11308035974707939ce0c",
+      "name": "LWM2M Track ({{.prefix}})",
+      "key": "{{.prefix}}_track",
+      "modelId": "81f51ae0b339efbe51e8cdcb"
+    }
+  ],
+  "triggers": [
+    {
+      "id": "61a700a6a4662e1b839551c1",
+      "name": "LWM2M - Send data to Track ({{.prefix}})",
+      "type": "script",
+      "def": "// if data comes in combined mode, this will trim the ID off the end of the string for readability\nvar trimIds = true\n\nvar model = {  name: event.endpoint.name,\n  tags: event.endpoint.tags,\n  values: {}\n}\n\nif(event.data.data.location_6) {\n  var loc = event.data.data.location_6['0']\n  model.location = {lat: loc.latitude_0, lon: loc.longitude_1 }\n}\n\nvar objName = ''\nvar objTrackName = ''\nfor(objName in event.data.data) {\n    objTrackName = objName\n    if(isNaN(objName)) {\n        var tail = objName.lastIndexOf('_')\n        var objNum = objName.substring(tail+1)\n        if(!isNaN(objNum && trimIds)) {\n          objTrackName = objName.substring(0, tail)\n        }\n    }\n\n    if(Object.keys(event.data.data[objName]).length===1) {\n        var inst = event.data.data[objName]['0']\n        // single instance\n        var resName = ''\n        var resTrackName = ''\n        for(resName in inst) {\n            resTrackName = resName\n            if(isNaN(resName)) {\n              var tail = resName.lastIndexOf('_')\n              var resNum = resName.substring(tail+1)\n              if(!isNaN(resNum && trimIds)) {\n                resTrackName = resName.substring(0, tail)\n              }\n            }\n\n            if(typeof inst[resName] === 'object' || Array.isArray(inst[resName])) {\n                // do nothing\n            } else {\n              model.values[objTrackName+'_'+resTrackName] = inst[resName]\n            }\n        }\n    }\n}\n\ntrack.publish('{{.prefix}}_track',event.endpoint.key,event.ts,model)\n//track.delete('{{.prefix}}_track', event.endpoint.key)",
+      "filterType": "lwm2m-data"
+    }
+  ]
+}

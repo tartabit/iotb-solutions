@@ -1,0 +1,29 @@
+{
+  "templateDef": [
+    {
+      "name": "Find Iridium - MO Listener",
+      "desc": "Select Iridium MO listener service",
+      "findService": "81e139d106c65fba13f194bf",
+      "key": "mo_listener"
+    }
+  ],
+  "services": [
+    {
+      "id": "627a773669a3c4907fb174fe",
+      "name": "Iridium - Track",
+      "key": "iridium-track",
+      "modelId": "81f51ae0b339efbe51e8cdcb"
+    }
+  ],
+  "triggers": [
+    {
+      "def": "var model = {\r\n    key: event.data.body.data.mo_header.imei,\r\n    name: event.data.body.data.mo_header.imei,\r\n    location: {\r\n        lat: event.data.body.data.location_information.latitude,\r\n        lon: event.data.body.data.location_information.longitude\r\n    },\r\n    values: {}\r\n}\r\n\r\n// decode payload here.\r\ntry {\r\n    var payload = convert.hexToBin(event.data.body.data.payload)\r\n    model.values = convert.binToString(payload)\r\n} catch(e) {\r\n\r\n}\r\n\r\ntrack.publish('iridium-track',event.data.body.data.mo_header.imei,event.ts,model)",
+      "filterServiceId": "{{.mo_listener}}",
+      "filterType": "aws-sqs-receive",
+      "id": "625461591e6094100853d156",
+      "name": "Iridium - Receive MO to Track",
+      "type": "script"
+    }
+  ]
+  ]
+}

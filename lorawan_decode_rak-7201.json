@@ -1,0 +1,18 @@
+{
+  "triggers": [
+    {
+      "id": "6011cb0ff9e0e15593398756",
+      "name": "Decode RAK7201 sensors",
+      "version": 0,
+      "type": "script",
+      "def": "var bin = convert.b64ToBin(event.data.data.data)\r\nvar obj = {}\r\nobj.endpointKey = event.endpoint.key\r\nobj.ts = event.ts\r\nobj['button_'+String.fromCharCode(bin[0])] = event.ts\r\nexec.now('data', obj)\r\n",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "rak7201-uplink"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "templateDef": [
+    {
+      "name": "Workspace ID",
+      "key": "workspace_id",
+      "desc": "Enter the workspace ID of the Log Analytics workspace."
+    },
+    {
+      "name": "Secret Key",
+      "key": "secret_key",
+      "desc": "Enter the secret key of the Log Analytics workspace."
+    },
+    {
+      "name": "Log name",
+      "key": "log_name",
+      "desc": "Name of the log to publish to.",
+      "value": "tartabit"
+    }
+  ],
+  "services": [
+    {
+      "id": "61ba510b166ddab0cfbfdb90",
+      "name": "Azure Log Analytics",
+      "key": "azure-log-analytics",
+      "modelId": "817729481e8d1f106ee3aabc",
+      "params": {
+        "shared_key": "{{.shared_key}}",
+        "workspace_id": "{{.workspace_id}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "61ba5155166ddab0cfbfdb91",
+      "name": "Send to Log Analytics",
+      "type": "script",
+      "def": "log_analytics.publish('azure-log-analytics','{{.log_name}}',event.ts,event.data.data)",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "data"
+        }
+      }
+    }
+  ]
+}

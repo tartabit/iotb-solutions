@@ -1,0 +1,18 @@
+{
+  "triggers": [
+    {
+      "id": "5ff76adfa6c6e3f890ce940b",
+      "name": "Decode laird sensors",
+      "version": 0,
+      "type": "script",
+      "def": "var binData = convert.b64ToBin(event.data.data.data)\ntemperature = binData[5] + binData[4]/100;\nhumidity = binData[3] + binData[2]/100;\nbattery = binData[6]*20;\nexec.now('data', {endpointKey: event.endpoint.key, ts: event.ts, temperature: temperature, humidity: humidity, battery: battery})",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "laird-uplink"
+        }
+      }
+    }
+  ]
+}

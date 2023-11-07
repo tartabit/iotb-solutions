@@ -1,0 +1,93 @@
+[
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/azure-iot.png",
+    "title": "Publish to Azure IoT Hub",
+    "import": "/solutions/generic_to_azure-iot.json",
+    "desc": "Integrate data from devices quickly to Microsoft Azure IoT Hub.",
+    "prereqs": [
+      "IoT Hub and service account connection string",
+      "Trigger generating generic 'data' events"
+    ],
+    "tags": [
+      "lwm2m",
+      "lora",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/azure-iot-central.png",
+    "title": "Publish to Azure IoT Central",
+    "import": "/solutions/generic_to_azure-iot-central.json",
+    "desc": "Integrate data from devices quickly to Microsoft Azure IoT Central.",
+    "prereqs": [
+      "IoT Hub and service account connection string",
+      "Trigger generating generic 'data' events"
+    ],
+    "tags": [
+      "lwm2m",
+      "lora",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/azure-eventhub.png",
+    "title": "Publish to Azure Event Hub",
+    "import": "/solutions/generic_to_azure-eventhub.json",
+    "desc": "Integrate data from devices quickly to Microsoft Event Hub.",
+    "prereqs": [
+      "Event Hub and service account connection string",
+      "Trigger generating generic 'data' events"
+    ],
+    "tags": [
+      "lwm2m",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/azure-cosmosdb.png",
+    "title": "Publish to Azure CosmosDB",
+    "import": "/solutions/generic_to_azure-cosmosdb.json",
+    "desc": "Insert records directly into CosmosDB.",
+    "prereqs": [
+      "CosmosDB database and a service account connection string",
+      "Trigger generating generic 'data' events"
+    ],
+    "tags": [
+      "lwm2m",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/azure-log-analytics.png",
+    "title": "Publish to Azure Log Analytics",
+    "import": "/solutions/generic_to_azure-log-analytics.json",
+    "desc": "Insert records directly into Log Analytics.",
+    "prereqs": [
+      "Log Analytics workspace",
+      "Trigger generating generic 'data' events"
+    ],
+    "tags": [
+      "lwm2m",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/influxdb.png",
+    "title": "Publish to InfluxDB",
+    "import": "/solutions/generic_to_influxdb.json",
+    "desc": "Insert metrics into InfluxDB.",
+    "prereqs": [
+      "InfluxDB server",
+      "Trigger generating generic 'data' events, data must be numeric."
+    ],
+    "tags": [
+      "lwm2m"
+    ]
+  }
+]

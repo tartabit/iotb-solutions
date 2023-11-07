@@ -1,0 +1,58 @@
+{
+  "templateDef": [
+    {
+      "name": "Instance Hostname",
+      "key": "hostname",
+      "desc": "The hostname for your ADT instance."
+    },
+    {
+      "name": "Service Principal Client ID",
+      "key": "client_id",
+      "desc": "The Client ID for the service principal associated with your ADT instance."
+    },
+    {
+      "name": "Service Principal Tenant",
+      "key": "tenant",
+      "desc": "The Tenant for the service principal associated with your ADT instance."
+    },
+    {
+      "name": "Service Principal Secret Key",
+      "key": "secret_key",
+      "desc": "The Secret Key for the service principal associated with your ADT instance."
+    }
+  ],
+  "services": [
+    {
+      "id": "6262fc6dec4021d13df1d931",
+      "name": "Azure Digital Twins",
+      "key": "digital-twin",
+      "modelId": "818cd858a6c151216d15383d",
+      "params": {
+        "client_id": "{{.client_id}}",
+        "hostname": "{{.hostname}}",
+        "secret_key": "{{.secret_key}}",
+        "tenant": "{{.tenant}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "627924cc8762ff37be5e7ee0",
+      "name": "Azure Digital Twin - Handle Changes",
+      "type": "script",
+      "def": "if (event.data.changes && event.data.changes.length > 0) {\r\n    event.data.changes.forEach(function (item) {\r\n        if (item.path === '/properties/command/string') {\r\n            var co = convert.delimitedStringToObject(item.value, 'op|path|value', ',')\r\n            log.trace('processing command', co)\r\n            switch (co.op) {\r\n                case 'write':\r\n                    try {\r\n                        lwm2m.write(event.data.id, co.path, co.value, { async: false })\r\n                        azure_twin.update('digital-twin', event.data.id, [{ op: 'replace', path: '/properties/commandReply', value: { string: 'success' } }])\r\n                    } catch (e) {\r\n                        azure_twin.update('digital-twin', event.data.id, [{ op: 'replace', path: '/properties/commandReply', value: { string: e.message } }])\r\n                    }\r\n                    break\r\n                case 'exec':\r\n                    try {\r\n                        lwm2m.exec(event.data.id, co.path, co.value, { async: false })\r\n                        azure_twin.update('digital-twin', event.data.id, [{ op: 'replace', path: '/properties/commandReply', value: { string: 'success' } }])\r\n                    } catch (e) {\r\n                        azure_twin.update('digital-twin', event.data.id, [{ op: 'replace', path: '/properties/commandReply', value: { string: e.message } }])\r\n                    }\r\n                    break\r\n                case 'read':\r\n                    try {\r\n                        var data = lwm2m.read(event.data.id, [co.path], co.value, { async: false })\r\n                        azure_twin.update('digital-twin', event.data.id, [{ op: 'replace', path: '/properties/commandReply', value: { string: JSON.stringify(data) } }])\r\n                    } catch (e) {\r\n                        azure_twin.update('digital-twin', event.data.id, [{ op: 'replace', path: '/properties/commandReply', value: { string: e.message } }])\r\n                    }\r\n                    break\r\n            }\r\n        }\r\n    })\r\n}\r\n",
+      "filterType": "azure-twin-changed"
+    },
+    {
+      "id": "6262da62ec4021d13df1d92e",
+      "name": "Azure Digital Twin - Send",
+      "type": "script",
+      "def": "var model = {\\r\\n    type: 'lwm2m',\\r\\n    properties: {}\\r\\n}\\r\\n\\r\\nvar data = event.data.data;\\r\\n\\r\\nvar changes = []\\r\\n\\r\\nif (data.location_latitude) {\\r\\n    model.gnss = {\\r\\n        location: {\\r\\n            lat: data.location_latitude,\\r\\n            lon: data.location_longitude\\r\\n        }\\r\\n    }\\r\\n    var op = {\\r\\n        op: 'add', path: '/properties/gnss', value: {\\r\\n            lat: {\\r\\n                lat: data.location_latitude,\\r\\n                lon: data.location_longitude\\r\\n            }\\r\\n        }\\r\\n    }\\r\\n    changes.push(op)\\r\\n}\\r\\n\\r\\nfor (var key in data) {\\r\\n    if (key.startsWith('location')) {\\r\\n        //ignore\\r\\n    } else {\\r\\n        var val = data[key]\\r\\n        key = key.replace(/\\\\//g, '_')\\r\\n        var op = { op: 'add', path: '/properties/' + key }\\r\\n        switch (typeof val) {\\r\\n            case 'string':\\r\\n                model.properties[key] = { string: val }\\r\\n                op.value = { string: val }\\r\\n                break\\r\\n            case 'number':\\r\\n                model.properties[key] = { double: val }\\r\\n                op.value = { double: val }\\r\\n                break\\r\\n            case 'boolean':\\r\\n                model.properties[key] = { boolean: val }\\r\\n                op.value = { boolean: val }\\r\\n                break\\r\\n            default:\\r\\n                log.trace(key + ': no mapping for type: ' + typeof val, val)\\r\\n                continue\\r\\n        }\\r\\n        changes.push(op)\\r\\n    }\\r\\n}\\r\\n\\r\\n//log.trace('model ['+event.endpoint.key+']', changes)\\r\\n\\r\\ntry {\\r\\n    azure_twin.update('digital-twin', event.endpoint.key, changes, { async: false })\\r\\n    azure_twin.send('digital-twin', event.endpoint.key, { telemetry: model })\\r\\n} catch (e) {\\r\\n    if (e.message.startsWith('DigitalTwinNotFound')) {\\r\\n        model.properties.command = { string: '' }\\r\\n        model.properties.commandReply = { string: '' }\\r\\n        azure_twin.add('digital-twin', event.endpoint.key, 'dtmi:com:tartabit:generic;1', model, { async: false })\\r\\n        azure_twin.send('digital-twin', event.endpoint.key, { telemetry: model })\\r\\n    }\\r\\n}",
+      "filterType": "generic",
+      "filterGeneric": "lwm2m-simple-data"
+    }
+  ],
+  "doNotStartTriggers": [
+    "627924cc8762ff37be5e7ee0"
+  ]
+}
