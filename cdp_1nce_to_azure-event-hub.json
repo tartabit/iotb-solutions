@@ -28,24 +28,31 @@
   "triggers": [
     {
       "id": "641dc486d7334bd83be5ac81",
-      "name": "1NCE Events to Event Hub",
+      "name": "1NCE to Event Hub - Events",
       "type": "script",
       "def": "eventhub.send('1nce-azure-eventhub', event.data, {type:'event'})",
       "filterType": "1nce-cdp-event"
     },
     {
       "id": "641dc5d8429c0027ae710409",
-      "name": "1NCE Sync to Event Hub",
+      "name": "1NCE to Event Hub - Sync",
       "type": "script",
       "def": "eventhub.send('1nce-azure-eventhub', event.data, {type:'sync'})",
       "filterType": "1nce-cdp-sim-sync"
     },
     {
       "id": "641dbabcd7334bd83be55a1a",
-      "name": "1NCE Usage to Event Hub",
+      "name": "1NCE to Event Hub - Usage",
       "type": "script",
       "def": "eventhub.send('1nce-azure-eventhub', event.data, {type:'usage'})",
       "filterType": "1nce-cdp-usage"
+    },
+    {
+      "id": "641dbabcd7334bd83be55a1b",
+      "name": "1NCE to Event Hub - Cloud",
+      "type": "script",
+      "def": "eventhub.send('1nce-azure-eventhub', event.data, {type:'cloud'})",
+      "filterType": "1nce-cdp-cloud"
     }
   ]
 }

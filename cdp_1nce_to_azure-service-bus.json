@@ -1,0 +1,70 @@
+{
+  "templateDef": [
+    {
+      "name": "Azure connection string",
+      "key": "conn_string",
+      "desc": "Enter the connection string for a policy with 'send' rights.",
+      "value": "Endpoint=sb://.../;SharedAccessKeyName=SenderPolicy;SharedAccessKey=...=;EntityPath=..."
+    },
+    {
+      "name": "Service bus topic",
+      "key": "topic",
+      "desc": "Enter the topic to publish to when events are received.",
+      "value": "1nce-events"
+    },
+    {
+      "name": "1NCE Connection",
+      "key": "service",
+      "desc": "Select a previously defined 1NCE connector.",
+      "findService": "81b586fc64a1db62782ac7d6"
+    }
+  ],
+  "services": [
+    {
+      "id": "658453d37d4b6cd6f0fe7a47",
+      "name": "1NCE Azure Service Bus",
+      "key": "1nce-azure-servicebus",
+      "modelId": "8134945a1b7e24f54a120b6d",
+      "params": {
+        "connection_string": "{{.conn_string}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "658454e671fcfe04197e18bd",
+      "name": "1NCE to Service bus - Sync",
+      "type": "script",
+      "def": "servicebus.topic_publish('1nce-azure-servicebus',global.values.serviceBusTopic,event.data,{subject:'sync'})",
+      "filterType": "1nce-cdp-sim-sync"
+    },
+    {
+      "id": "658454ca71fcfe04197e18b6",
+      "name": "1NCE to Service Bus - Usage",
+      "type": "script",
+      "def": "servicebus.topic_publish('1nce-azure-servicebus',global.values.serviceBusTopic,event.data,{subject:'usage'})",
+      "filterType": "1nce-cdp-usage"
+    },
+    {
+      "id": "6584a5ca71fcfe04197e23a9",
+      "name": "1NCE to Service Bus - Event",
+      "type": "script",
+      "def": "servicebus.topic_publish('1nce-azure-servicebus',global.values.serviceBusTopic,event.data,{subject:'event'})",
+      "filterType": "1nce-cdp-event"
+    },
+    {
+      "id": "6584a5ca71fcfe04197e23aa",
+      "name": "1NCE to Service Bus - Cloud",
+      "type": "script",
+      "def": "servicebus.topic_publish('1nce-azure-servicebus',global.values.serviceBusTopic,event.data,{subject:'cloud'})",
+      "filterType": "1nce-cdp-cloud"
+    }
+  ],
+  "triggerGlobals": [
+    {
+      "key": "serviceBusTopic",
+      "value": "{{.topic}}",
+      "isSecret": false
+    }
+  ]
+}

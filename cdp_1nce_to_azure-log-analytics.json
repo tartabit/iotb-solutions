@@ -32,24 +32,31 @@
   "triggers": [
     {
       "id": "641dc486d7334bd83be5ac81",
-      "name": "1NCE Events to Log Analytics",
+      "name": "1NCE to Log Analytics - Events",
       "type": "script",
       "def": "log_analytics.publish('1nce-azure-log-analytics','cdp_1nce_events',event.ts,event.data)",
       "filterType": "1nce-cdp-event"
     },
     {
       "id": "641dc5d8429c0027ae710409",
-      "name": "1NCE Sync to Log Analytics",
+      "name": "1NCE to Log Analytics - Sync",
       "type": "script",
       "def": "log_analytics.publish('1nce-azure-log-analytics','cdp_1nce_sims',event.ts,event.data)",
       "filterType": "1nce-cdp-sim-sync"
     },
     {
       "id": "641dbabcd7334bd83be55a1a",
-      "name": "1NCE Usage to Log Analytics",
+      "name": "1NCE to Log Analytics - Usage",
       "type": "script",
       "def": "log_analytics.publish('1nce-azure-log-analytics','cdp_1nce_usage',event.ts,event.data)",
       "filterType": "1nce-cdp-usage"
+    },
+    {
+      "id": "641dbabcd7334bd83be55a1b",
+      "name": "1NCE to Log Analytics - Cloud",
+      "type": "script",
+      "def": "log_analytics.publish('1nce-azure-log-analytics','cdp_1nce_cloud',event.ts,event.data)",
+      "filterType": "1nce-cdp-cloud"
     }
   ]
 }

@@ -29,24 +29,31 @@
   "triggers": [
     {
       "id": "641dc486d7334bd83be5ac81",
-      "name": "1NCE Events to IoT Hub",
+      "name": "1NCE to IoT Hub - Events",
       "type": "script",
       "def": "azure_iot.send('1nce-azure-iothub', event.data.sim.iccid, event.data);\nazure_iot.twin_update('1nce-azure-iothub', event.data.sim.iccid, event.data)",
       "filterType": "1nce-cdp-event"
     },
     {
       "id": "641dc5d8429c0027ae710409",
-      "name": "1NCE Sync to IoT Hub",
+      "name": "1NCE to IoT Hub - Sync",
       "type": "script",
       "def": "azure_iot.send('1nce-azure-iothub', event.data.general.iccid, event.data);\nazure_iot.twin_update('1nce-azure-iothub', event.data.general.iccid, event.data)",
       "filterType": "1nce-cdp-sim-sync"
     },
     {
       "id": "641dbabcd7334bd83be55a1a",
-      "name": "1NCE Usage to IoT Hub",
+      "name": "1NCE to IoT Hub - Usage",
       "type": "script",
       "def": "azure_iot.send('1nce-azure-iothub', event.data.sim.iccid, event.data);\nazure_iot.twin_update('1nce-azure-iothub', event.data.sim.iccid, event.data)",
       "filterType": "1nce-cdp-usage"
+    },
+    {
+      "id": "641dbabcd7334bd83be55a1b",
+      "name": "1NCE to IoT Hub - Cloud",
+      "type": "script",
+      "def": "azure_iot.send('1nce-azure-iothub', event.data.sim.iccid, event.data);\nazure_iot.twin_update('1nce-azure-iothub', event.data.sim.iccid, event.data)",
+      "filterType": "1nce-cdp-cloud"
     }
   ]
 }

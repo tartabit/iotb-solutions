@@ -15,6 +15,77 @@
   },
   {
     "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/aws-dynamodb.png",
+    "title": "1NCE to AWS DynamoDB ",
+    "desc": "Coming soon...",
+    "prereqs": [
+      "1NCE quickstart"
+    ],
+    "tags": [
+      "cdp",
+      "1nce",
+      "aws"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/aws-kinesis.png",
+    "title": "1NCE to AWS Kinesis ",
+    "desc": "Coming soon...",
+    "prereqs": [
+      "1NCE quickstart"
+    ],
+    "tags": [
+      "cdp",
+      "1nce",
+      "aws"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/aws-sqs.png",
+    "title": "1NCE to AWS SQS Queue",
+    "import": "/solutions/cdp_1nce_to_aws-sqs.json",
+    "desc": "Send events to sqs.",
+    "prereqs": [
+      "1NCE quickstart"
+    ],
+    "tags": [
+      "cdp",
+      "1nce",
+      "aws"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/azure-cosmosdb.png",
+    "title": "1NCE to Azure CosmosDB",
+    "desc": "Coming soon...",
+    "prereqs": [
+      "1NCE quickstart"
+    ],
+    "tags": [
+      "cdp",
+      "1nce",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/azure-digital-twins.png",
+    "title": "1NCE to Azure Digital Twins",
+    "desc": "Coming soon...",
+    "prereqs": [
+      "1NCE quickstart"
+    ],
+    "tags": [
+      "cdp",
+      "1nce",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/cdp-1nce.png",
     "rightImg": "/solutions/icons/azure-iot.png",
     "title": "1NCE to Azure IoT Hub",
     "import": "/solutions/cdp_1nce_to_azure-iot-hub.json",
@@ -56,6 +127,49 @@
       "cdp",
       "1nce",
       "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/azure-servicebus.png",
+    "title": "1NCE to Azure Service Bus",
+    "import": "/solutions/cdp_1nce_to_azure-service-bus.json",
+    "desc": "Send events to service bus.",
+    "prereqs": [
+      "1NCE quickstart"
+    ],
+    "tags": [
+      "cdp",
+      "1nce",
+      "azure"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/gcp-firebase.png",
+    "title": "1NCE to GCP Firebase",
+    "desc": "Coming soon...",
+    "prereqs": [
+      "1NCE quickstart"
+    ],
+    "tags": [
+      "cdp",
+      "1nce",
+      "gcp"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/gcp-pubsub.png",
+    "title": "1NCE to GCP Pub/Sub",
+    "desc": "Coming soon...",
+    "prereqs": [
+      "1NCE quickstart"
+    ],
+    "tags": [
+      "cdp",
+      "1nce",
+      "gcp"
     ]
   }
 ]

@@ -1,0 +1,45 @@
+{
+  "templateDef": [
+    {
+      "name": "Azure connection string",
+      "key": "conn_string",
+      "desc": "Enter the connection string for a policy with 'iothubowner' rights.",
+      "value": "HostName=****.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=********"
+    },
+    {
+      "name": "Activity timeout",
+      "key": "activity_timeout",
+      "desc": "If there is no activity, close the Azure device connection after this timeout.",
+      "value": "600"
+    }
+  ],
+  "services": [
+    {
+      "id": "5f5b9e49dfb509446ef1b73f",
+      "name": "Azure IoT Hub",
+      "key": "azure_iothub",
+      "modelId": "811382a6ea7fb1f40f682af3",
+      "params": {
+        "activity_timeout": "{{.activity_timeout}}",
+        "authentication": "ServiceAccount",
+        "connection_string": "{{.conn_string}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "5f5b9e4adfb509446ef1b742",
+      "name": "Send to Azure IoT",
+      "version": 2,
+      "type": "script",
+      "def": "azure_iot.send('azure_iothub', event.endpoint.key, event.data.data);\nazure_iot.twin_update('azure_iothub', event.endpoint.key, {name: event.data.data});",
+      "filterType": "generic",
+      "filterCustom": {
+        "key": {
+          "comp": "eq",
+          "value": "data"
+        }
+      }
+    }
+  ]
+}

@@ -2,6 +2,7 @@
   "lwm2m.json",
   "generic.json",
   "lora.json",
+  "aws.json",
   "iridium.json",
   "micron.json",
   "nimbelink.json",

@@ -1,0 +1,17 @@
+[
+  {
+    "leftImg": "/solutions/icons/mqtt.png",
+    "rightImg": "/solutions/icons/aws-iot-core.png",
+    "title": "MQTT to AWS IoT Core",
+    "import": "/solutions/mqtt_to_aws-iot.json",
+    "desc": "Bridge unencrypted MQTT connections to AWS IoT Core.",
+    "prereqs": [
+      "MQTT device",
+      "AWS IoT Core"
+    ],
+    "tags": [
+      "aws",
+      "mqtt"
+    ]
+  }
+]
