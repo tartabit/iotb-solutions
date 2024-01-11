@@ -1,45 +1,101 @@
 {
   "templateDef": [
     {
-      "name": "Azure connection string",
-      "key": "conn_string",
-      "desc": "Enter the connection string for a policy with 'iothubowner' rights.",
-      "value": "HostName=****.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=********"
+      "name": "AWS IoT Core Endpoint",
+      "key": "endpoint",
+      "desc": "Enter the AWS IoT Core MQTT endpoint.",
+      "value": "<your-endpointhere>.amazonaws.com"
     },
     {
       "name": "Activity timeout",
       "key": "activity_timeout",
-      "desc": "If there is no activity, close the Azure device connection after this timeout.",
+      "desc": "If there is no activity, close the AWS-IoT device connection after this timeout.",
       "value": "600"
+    },
+    {
+      "name": "AWS IoT Core CA Certificate",
+      "key": "ca_cert",
+      "desc": "Upload your CA certificate.",
+      "multiline": 6,
+      "upload": true
+    },
+    {
+      "name": "AWS IoT Core CA Private Key",
+      "key": "ca_key",
+      "desc": "upload your CA private key.",
+      "multiline": 6,
+      "upload": true
+    },
+    {
+      "name": "MQTT Registration Username",
+      "key": "mqtt_reg_user",
+      "desc": "MQTT clients will use this username to authenticate to the broker.",
+      "genWords": 2
+    },
+    {
+      "name": "MQTT Registration Password",
+      "key": "mqtt_reg_pass",
+      "desc": "MQTT clients will use this password to authenticate to the broker.",
+      "genString": 12
     }
   ],
   "services": [
     {
-      "id": "5f5b9e49dfb509446ef1b73f",
-      "name": "Azure IoT Hub",
-      "key": "azure_iothub",
-      "modelId": "811382a6ea7fb1f40f682af3",
+      "id": "655cdd436804e1cb34999238",
+      "name": "AWS IoT Core",
+      "key": "iot-core",
+      "modelId": "81167b90ea08cf11a21bea40",
       "params": {
         "activity_timeout": "{{.activity_timeout}}",
-        "authentication": "ServiceAccount",
-        "connection_string": "{{.conn_string}}"
+        "certificate": "{{.ca_cert}}",
+        "mqtt_host": "mqtts://{{.endpoint}}:8883",
+        "private_key": "{{.ca_key}}"
+      }
+    },
+    {
+      "id": "658725f57d4b6cd6f0fe7d19",
+      "name": "Proxy MQTT",
+      "key": "mqtt",
+      "modelId": "813011a2e4ebda0332af167b",
+      "params": {
+        "auto_password": "{{.mqtt_reg_pass}}",
+        "auto_username": "{{.mqtt_reg_user}}",
+        "device_to_device": "false",
+        "scope": "account",
+        "subscriptions": "#"
       }
     }
   ],
   "triggers": [
     {
-      "id": "5f5b9e4adfb509446ef1b742",
-      "name": "Send to Azure IoT",
-      "version": 2,
+      "id": "658729828d9b3224ccc41d72",
+      "name": "Proxy - Subscribes",
       "type": "script",
-      "def": "azure_iot.send('azure_iothub', event.endpoint.key, event.data.data);\nazure_iot.twin_update('azure_iothub', event.endpoint.key, {name: event.data.data});",
-      "filterType": "generic",
-      "filterCustom": {
-        "key": {
-          "comp": "eq",
-          "value": "data"
-        }
-      }
+      "def": "aws_iot.subscribe('iot-core',event.endpoint.key,event.data.topics,event.data.qoss)",
+      "filterServiceId": "658725f57d4b6cd6f0fe7d19",
+      "filterType": "mqtt-subscribe"
+    },
+    {
+      "id": "658729f18d9b3224ccc41d7f",
+      "name": "Proxy - Publish MQTT -> IOT Core",
+      "type": "script",
+      "def": "aws_iot.publish('iot-core',event.endpoint.key,event.data.topic,event.data.payload)",
+      "filterServiceId": "658725f57d4b6cd6f0fe7d19",
+      "filterType": "mqtt-publish"
+    },
+    {
+      "id": "65872a428d9b3224ccc41d8a",
+      "name": "Proxy - Publish IoT Core -> MQTT",
+      "type": "script",
+      "def": "mqtt.publish('mqtt',event.data.topic,event.data.payload)",
+      "filterType": "aws-iot-core-publish-recv"
+    },
+    {
+      "id": "658c59718d9b3224ccc4ca92",
+      "name": "Proxy - Disconnects",
+      "type": "script",
+      "def": "aws_iot.disconnect('iot-core',event.endpoint.key)",
+      "filterType": "mqtt-disconnected"
     }
   ]
 }
