@@ -41,7 +41,7 @@
       "id": "641dc5d8429c0027ae710409",
       "name": "BICS to Log Analytics - Sync",
       "type": "script",
-      "def": "log_analytics.publish('1nce-azure-log-analytics','cdp_bics_sims',event.ts,event.data)",
+      "def": "log_analytics.publish('bics-azure-log-analytics','cdp_bics_sims',event.ts,event.data)",
       "filterType": "bics-cdp-sim-sync"
     },
     {
