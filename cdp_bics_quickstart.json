@@ -1,0 +1,44 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    },
+    {
+      "name": "Webhook",
+      "key": "webhook",
+      "desc": "The webhook secret to for data stream publishes.",
+      "value": "abc123",
+      "genString": 32
+    },
+    {
+      "name": "BICS API Username",
+      "key": "api_user",
+      "desc": "Username to access BICS API.",
+      "value": ""
+    },
+    {
+      "name": "BICS API Password",
+      "key": "api_pass",
+      "desc": "The password for your account.",
+      "value": ""
+    }
+  ],
+  "services": [
+    {
+      "id": "641db53e4d8fc7b4a8038396",
+      "name": "BICS Connector ({{.prefix}})",
+      "key": "{{.prefix}}-bics",
+      "modelId": "818f1ce18dc030669547f42a",
+      "params": {
+        "api_password": "{{.api_pass}}",
+        "api_user": "{{.api_user}}",
+        "endpoint_lookup": "none",
+        "target_sync_hour": "8",
+        "webhook": "{{.webhook}}"
+      }
+    }
+  ]
+}

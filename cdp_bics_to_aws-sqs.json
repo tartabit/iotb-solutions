@@ -24,21 +24,21 @@
     {
       "name": "SQS - MO Queue Name",
       "key": "sqs_q_name",
-      "desc": "Enter the name of your Queue.",
-      "value": "1nce_data"
+      "desc": "Enter the name of your MO Queue.",
+      "value": "bics_data"
     },
     {
-      "name": "1NCE Connection",
+      "name": "BICS Connection",
       "key": "service",
-      "desc": "Select a previously defined 1NCE connector.",
-      "findService": "81b586fc64a1db62782ac7d6"
+      "desc": "Select a previously defined BICS connector.",
+      "findService": "818f1ce18dc030669547f42a"
     }
   ],
   "services": [
     {
       "id": "658f0e1a350200a9ee08a564",
-      "name": "1NCE AWS SQS Queue ({{.sqs_q_name}})",
-      "key": "1nce-aws-sqs-{{.sqs_q_name}}",
+      "name": "BICS AWS SQS Queue ({{.sqs_q_name}})",
+      "key": "bics-aws-sqs-{{.sqs_q_name}}",
       "modelId": "81e139d106c65fba13f194bf",
       "params": {
         "access_key_id": "{{.access_key_id}}",
@@ -52,31 +52,24 @@
   "triggers": [
     {
       "id": "658f0e94772d23fd93ba6e10",
-      "name": "1NCE to SQS - Events",
+      "name": "BICS to SQS - Mobility",
       "type": "script",
-      "def": "aws_sqs.send('1nce-aws-sqs-{{.sqs_q_name}}',body,{attributes:{'events'}})",
-      "filterType": "1nce-cdp-event"
+      "def": "aws_sqs.send('bics-aws-sqs-{{.sqs_q_name}}',body,{attributes:{'mobility'}})",
+      "filterType": "bics-cdp-mobility"
     },
     {
       "id": "658f0e94772d23fd93ba6e11",
-      "name": "1NCE to SQS - Sync",
+      "name": "BICS to SQS - Sync",
       "type": "script",
-      "def": "aws_sqs.send('1nce-aws-sqs-{{.sqs_q_name}}',body,{attributes:{'sync'}})",
-      "filterType": "1nce-cdp-sync"
+      "def": "aws_sqs.send('bics-aws-sqs-{{.sqs_q_name}}',body,{attributes:{'sync'}})",
+      "filterType": "bics-cdp-sync"
     },
     {
       "id": "658f0e94772d23fd93ba6e12",
-      "name": "1NCE to SQS - Usage",
+      "name": "BICS to SQS - Usage",
       "type": "script",
-      "def": "aws_sqs.send('1nce-aws-sqs-{{.sqs_q_name}}',body,{attributes:{'usage'}})",
-      "filterType": "1nce-cdp-usage"
-    },
-    {
-      "id": "658f0e94772d23fd93ba6e13",
-      "name": "1NCE to SQS - Cloud",
-      "type": "script",
-      "def": "aws_sqs.send('1nce-aws-sqs-{{.sqs_q_name}}',body,{attributes:{'cloud'}})",
-      "filterType": "1nce-cdp-cloud"
+      "def": "aws_sqs.send('bics-aws-sqs-{{.sqs_q_name}}',body,{attributes:{'usage'}})",
+      "filterType": "bics-cdp-usage"
     }
   ]
 }

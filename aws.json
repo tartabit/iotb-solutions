@@ -13,5 +13,20 @@
       "aws",
       "mqtt"
     ]
+  },
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/aws-dynamodb.png",
+    "title": "UDP to AWS DynamDB",
+    "import": "/solutions/udp_to_aws-dynamodb.json",
+    "desc": "Read UDP packets and insert to DynamoDB.",
+    "prereqs": [
+      "UDP device",
+      "AWS DynamoDB"
+    ],
+    "tags": [
+      "aws",
+      "udp"
+    ]
   }
 ]

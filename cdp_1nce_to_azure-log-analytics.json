@@ -24,7 +24,7 @@
       "key": "1nce-azure-log-analytics",
       "modelId": "817729481e8d1f106ee3aabc",
       "params": {
-        "shared_key": "{{.shared_key}}",
+        "shared_key": "{{.secret_key}}",
         "workspace_id": "{{.workspace_id}}"
       }
     }

@@ -1,6 +1,12 @@
 {
   "templateDef": [
     {
+      "name": "AWS CloudFormation",
+      "key": "cloudformation",
+      "desc": "Enter the AWS IoT Core MQTT endpoint.",
+      "value": "<your-endpointhere>.amazonaws.com"
+    },
+    {
       "name": "AWS IoT Core Endpoint",
       "key": "endpoint",
       "desc": "Enter the AWS IoT Core MQTT endpoint.",
