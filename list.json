@@ -5,6 +5,7 @@
   "aws.json",
   "iridium.json",
   "micron.json",
+  "murata.json",
   "nimbelink.json",
   "queclink.json",
   "cdp_1nce.json",
