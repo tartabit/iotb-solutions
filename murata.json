@@ -50,7 +50,7 @@
     "leftImg": "/solutions/icons/murata.png",
     "rightImg": "/solutions/icons/aws-iot-core.png",
     "title": "Murata to AWS IoT Core (Delimited)",
-    "import": "/solutions/murata_udp_delimited_to_aws-iot.json",
+    "import": "/solutions/murata_udp_delim_to_aws-iot.json",
     "desc": "Bridge delimited UDP messages to AWS IoT Core.",
     "prereqs": [
       "Murata 1SC module",
