@@ -1,27 +1,21 @@
 {
-  "templateDef": [
-    {
-      "name": "Solution Prefix",
-      "key": "prefix",
-      "desc": "Prefix to be prepended on all defined objects.",
-      "genWords": 2
-    }
-  ],
   "services": [
     {
-      "id": "61a11308035974707939ce0c",
-      "name": "{{.prefix}} Queclink Track",
-      "key": "{{.prefix}}_track",
+      "id": "61ac3e675d052a1465bf4b68",
+      "name": "Queclink Track",
+      "key": "queclink-track",
       "modelId": "81f51ae0b339efbe51e8cdcb"
     }
   ],
   "triggers": [
     {
-      "id": "61a524d31184786b6002186d",
-      "name": "Queclink Track Publish ({{.prefix}})",
+      "id": "645e944c3855f68ba7567049",
+      "name": "Queclink - Send to Track",
       "type": "script",
-      "def": "var trackData = {name: event.endpoint.name, event: event.data.report.messageTypeDetail, tags: event.endpoint.tags, values:{}}\r\n\r\nif(event.data.report.location) {\r\n    trackData.location = {lat:event.data.report.location.latitude, lon: event.data.report.location.longitude}\r\n    trackData.values.heading = event.data.report.location.heading\r\n    trackData.values.speed = event.data.report.location.speed\r\n    trackData.values.locationAge = event.data.report.location.age\r\n}\r\n\r\nif(event.data.report.temperature) {\r\n    trackData.values.temp = event.data.report.temperature\r\n}\r\n\r\nif(event.data.report.battery) {\r\n    trackData.values.battery = event.data.report.battery\r\n}\r\n\r\nif(event.data.report.protocolVersion) {\r\n    trackData.values.protocolVersion = event.data.report.protocolVersion\r\n}\r\n\r\nif(event.data.report.firmwareVersion) {\r\n    trackData.values.firmwareVersion = event.data.report.firmwareVersion\r\n}\r\n\r\nif(event.data.report.network) {\r\n    var network = convert.mccmnc(event.data.report.network.mcc,event.data.report.network.mnc)\r\n    trackData.values.network = network.operator\r\n}\r\n\r\ntrackData.values.ignition = event.data.report.ignition\r\ntrackData.values.moving = event.data.report.motion\r\ntrackData.values.type = event.data.report.deviceType\r\n\r\nif(event.data.report.motionStatus) {\r\n    trackData.values.motionStatus = event.data.report.motionStatus\r\n}\r\n\r\ntrack.publish('{{.prefix}}_track', event.endpoint.key,event.ts,trackData)",
-      "filterType": "queclink-report"
+      "def": "\r\nvar msg = event.data.data\r\n\r\nvar model  = {  name: event.endpoint.name,\r\n  values: Object.assign({}, msg)\r\n}\r\nif(msg.gps) {\r\n  model.location = {\r\n      lat: msg.gps.latitude, \r\n      lon: msg.gps.longitude\r\n    }\r\n}\r\n\r\ntrack.publish('queclink-track',event.endpoint.key,msg.ts,model)",
+      "filterType": "generic",
+      "filterGeneric": "queclink-data",
+      "genericSample": "{}"
     }
   ]
 }
