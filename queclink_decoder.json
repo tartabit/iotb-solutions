@@ -61,6 +61,21 @@
       "type": "script"
     },
     {
+      "id": "660e1b981dc527161894fc38",
+      "name": "Queclink - Geofence endpoints",
+      "type": "script",
+      "def": "if(!event.data.data.gps || !event.data.data.gps.latitude) {\r\n    trigger.exit()\r\n}\r\ngeofence.eval(event.endpoint.key,event.ts,event.data.data.gps.latitude,event.data.data.gps.longitude,{context:{command:event.data.data.cmd, eventId: event.id}})",
+      "filterType": "generic",
+      "filterGeneric": "queclink-data",
+      "filterCustom": {
+        "data.gps.latitude": {
+          "comp": "exists",
+          "value": ""
+        }
+      },
+      "genericSample": "{}"
+    },
+    {
       "def": "\r\nfunction send_raw_command(key, password, command, params, queueOnFailure) {\r\n    var id = random.hex(4)\r\n\r\n    if(params.endsWith('$')) {\r\n        var lastComma = params.lastIndexOf(',')\r\n        params = params.substr(0,lastComma+1)\r\n        //log.trace('trimmed command to: '+command)\r\n    }\r\n\r\n    var fullCommand = 'AT+'+command+'='+password+','+params + id + '$'\r\n    log.trace('sent command ['+fullCommand+'] to ['+key+']')\r\n\r\n    udp.send('',key,fullCommand)\r\n\r\n    var ack = trigger.wait('queclink:'+key+':'+id,10)\r\n\r\n    if(ack) {\r\n        log.trace('received reply ['+JSON.stringify(ack)+'] from ['+key+'] for ['+fullCommand+']')\r\n        return {success: true}\r\n    } else {\r\n        log.trace('timed out waiting for reply from ['+key+'] for ['+fullCommand+']')\r\n        if(queueOnFailure) {\r\n            log.trace('queued', ack)\r\n            udp.queue('',key,command,fullCommand,86400)\r\n        }\r\n        return {success: false, error: 'timeout'}\r\n    }\r\n}\r\n",
       "filterType": "library",
       "id": "645e944c3855f68ba756704e",
@@ -86,7 +101,7 @@
       "type": "script"
     }
   ],
-  "doNotStartTriggers": ["64da92706c3caaf84077528f"],
+  "doNotStartTriggers": ["64da92706c3caaf84077528f", "660e1b981dc527161894fc38"],
   "triggerGlobals": [
     {
       "key": "queclinkDebug",
