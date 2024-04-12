@@ -1,18 +1,19 @@
 {
   "triggers": [
     {
-      "id": "6529530e3917527f922ad3a1",
-      "name": "Queclink - DM - Battery Monitor",
+      "id": "661754ceac2f0b904708c23e",
+      "name": "Queclink - DM - Query Versions",
       "type": "script",
-      "def": "\r\nif(event.data.data.battery>80) {\r\n    endpoint.updateTags(event.endpoint.key,{battery:'80+'})\r\n    alert.resolve('queclink-alerts',event.endpoint.key+'-battery-low', 'battery charged',{tags:{type:'queclink-battery'}})\r\n} else if(event.data.data.battery>50) {\r\n    endpoint.updateTags(event.endpoint.key,{battery:'50-80'})\r\n    alert.resolve('queclink-alerts',event.endpoint.key+'-battery-low', 'battery charged',{tags:{type:'queclink-battery'}})\r\n} else if(event.data.data.battery>20) {\r\n    endpoint.updateTags(event.endpoint.key,{battery:'20-50'})\r\n    alert.resolve('queclink-alerts',event.endpoint.key+'-battery-low', 'battery charged',{tags:{type:'queclink-battery'}})\r\n} else {\r\n    endpoint.updateTags(event.endpoint.key,{battery:'<20'})\r\n    alert.raise('queclink-alerts',event.endpoint.key+'-battery-low',event.endpoint.name+ ' battery low','medium','battery level: '+event.data.data.battery,{tags:{type:'queclink-battery'}})\r\n}\r\nreport.publish('queclink-battery',event.endpoint.key,event.ts,{name:event.endpoint.name, values:{battery: event.data.data.battery}})\r\n",
+      "def": "exec.now('queclink-rto-command', {command:'ver'})",
       "filterType": "generic",
       "filterGeneric": "queclink-data",
       "filterCustom": {
-        "data.battery": {
-          "comp": "exists",
-          "value": ""
+        "missing-tag:firmware": {
+          "comp": "missing-tag",
+          "value": "firmware"
         }
-      }
+      },
+      "genericSample": "{}"
     },
     {
       "id": "6602ff53d42f035005935f05",
@@ -28,6 +29,20 @@
         }
       },
       "genericSample": "{}"
+    },
+    {
+      "id": "6529530e3917527f922ad3a1",
+      "name": "Queclink - DM - Battery Monitor",
+      "type": "script",
+      "def": "\r\nif(event.data.data.battery>80) {\r\n    endpoint.updateTags(event.endpoint.key,{battery:'80+'})\r\n    alert.resolve('queclink-alerts',event.endpoint.key+'-battery-low', 'battery charged',{tags:{type:'queclink-battery'}})\r\n} else if(event.data.data.battery>50) {\r\n    endpoint.updateTags(event.endpoint.key,{battery:'50-80'})\r\n    alert.resolve('queclink-alerts',event.endpoint.key+'-battery-low', 'battery charged',{tags:{type:'queclink-battery'}})\r\n} else if(event.data.data.battery>20) {\r\n    endpoint.updateTags(event.endpoint.key,{battery:'20-50'})\r\n    alert.resolve('queclink-alerts',event.endpoint.key+'-battery-low', 'battery charged',{tags:{type:'queclink-battery'}})\r\n} else {\r\n    endpoint.updateTags(event.endpoint.key,{battery:'<20'})\r\n    alert.raise('queclink-alerts',event.endpoint.key+'-battery-low',event.endpoint.name+ ' battery low','medium','battery level: '+event.data.data.battery,{tags:{type:'queclink-battery'}})\r\n}\r\nreport.publish('queclink-battery',event.endpoint.key,event.ts,{name:event.endpoint.name, values:{battery: event.data.data.battery}})\r\n",
+      "filterType": "generic",
+      "filterGeneric": "queclink-data",
+      "filterCustom": {
+        "data.battery": {
+          "comp": "exists",
+          "value": ""
+        }
+      }
     }
   ],
   "reports": [
