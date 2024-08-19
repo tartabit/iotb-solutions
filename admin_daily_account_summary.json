@@ -13,7 +13,7 @@
     {
       "key": "dailySummaryConfig",
       "value": {
-        "name": "prod-us",
+        "name": "{{.name}}",
         "sendTo": [
           "{{.sendTo}}"
         ],
@@ -24,9 +24,14 @@
   ],
   "templateDef": [
     {
+      "name": "Name",
+      "key": "name",
+      "desc": "Name to help identify the summary email."
+    },
+    {
       "name": "Send To",
       "key": "sendTo",
-      "desc": "Email address to send the daily summary to"
+      "desc": "Email address to send the daily summary to."
     }
   ]
 }
