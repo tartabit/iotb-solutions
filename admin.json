@@ -1,0 +1,14 @@
+[
+  {
+    "leftImg": "/solutions/icons/iot-bridge.png",
+    "rightImg": "/solutions/icons/generic-email.png",
+    "title": "Daily account summary",
+    "import": "/solutions/admin_account_summary.json",
+    "desc": "Daily account summary for administrators.",
+    "prereqs": [
+    ],
+    "tags": [
+      "admin"
+    ]
+  }
+]
