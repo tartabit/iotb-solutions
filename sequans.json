@@ -1,0 +1,54 @@
+[
+  {
+    "leftImg": "/solutions/icons/sequans-monarch.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "Sequans Monarch UDP Decoder",
+    "import": "/solutions/sequans_udp.json",
+    "desc": "Receive data from Sequans modules via UDP.",
+    "prereqs": [
+      "Sequans Monarch module"
+    ],
+    "tags": [
+      "sequans"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/sequans-nektar.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "Sequans Nektar UDP Decoder",
+    "import": "/solutions/sequans_udp.json",
+    "desc": "Receive data from Sequans evaluation kits via UDP.",
+    "prereqs": [
+      "Sequans Nektar kit"
+    ],
+    "tags": [
+      "sequans"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/sequans-monarch.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "Sequans Monarch CoAP Decoder",
+    "import": "/solutions/sequans_coap.json",
+    "desc": "Receive data from Sequans modules via CoAP.",
+    "prereqs": [
+      "Sequans Monarch module"
+    ],
+    "tags": [
+      "sequans"
+    ]
+  },
+  {
+    "leftImg": "/solutions/icons/sequans-nektar.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "Sequans Nektar CoAP Decoder",
+    "import": "/solutions/sequans_coap.json",
+    "desc": "Receive data from Sequans evaluation kits via CoAP.",
+    "prereqs": [
+      "Sequans Nektar kit"
+    ],
+    "tags": [
+      "sequans"
+    ]
+  }
+]

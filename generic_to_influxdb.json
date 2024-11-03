@@ -4,13 +4,26 @@
       "name": "InfluxDB server",
       "key": "server",
       "desc": "The URL for the influxdb server.",
-      "value": "http://<address>:8086"
+      "value": "https://<address>"
     },
 	{
-      "name": "Database name",
-      "key": "dbname",
-      "desc": "The name of the database.",
+      "name": "Bucket Name",
+      "key": "bucket",
+      "desc": "The name of the bucket.",
       "value": "demo"
+    },
+    {
+      "name": "Organization Name",
+      "key": "org",
+      "desc": "The name of the organization.",
+      "value": "tartabit"
+    },
+    {
+      "name": "Secret Token",
+      "key": "token",
+      "desc": "The name of the organization.",
+      "value": "",
+      "secret": true
     },
 	{
       "name": "Metric name",
@@ -26,7 +39,9 @@
       "key": "influxdb",
       "modelId": "81f3b4b560a24e692418b239",
       "params": {
-        "database": "{{.dbname}}",
+        "bucket": "{{.bucket}}",
+        "org": "{{.org}}",
+        "token": "{{.token}}",
         "url": "{{.server}}"
       }
     }
@@ -37,14 +52,9 @@
       "name": "Send to InfluxDB",
       "version": 2,
       "type": "script",
-      "def": "influxdb.publish('influxdb', {{.metric_name}}, {name: event.endpoint.name, key: event.endpoint.key}, event.data.data);",
+      "def": "influxdb.publish('influxdb', '{{.metric_name}}', {name: event.endpoint.name, key: event.endpoint.key}, event.data.data)",
       "filterType": "generic",
-      "filterCustom": {
-        "key": {
-          "comp": "eq",
-          "value": "data"
-        }
-      }
+      "filterGeneric": "data"
     }
   ]
 }

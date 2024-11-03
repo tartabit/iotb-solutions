@@ -1,0 +1,33 @@
+{
+  "templateDef": [
+    {
+      "name": "Port",
+      "key": "coap_port",
+      "desc": "Port assigned by Tartabit, open a support ticket to request an assigned port.",
+      "value": "9999"
+    }
+  ],
+  "services": [
+    {
+      "id": "6726387edaab4af297728a83",
+      "name": "Sequans CoAP",
+      "key": "sequans-coap",
+      "modelId": "81450249962accd689c98bb5",
+      "params": {
+        "endpoint_key_field": "1",
+        "endpoint_key_type": "path-segment",
+        "port": "{{.coap_port}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": "6727c3cfc0c58b0129b151a9",
+      "name": "Sequans CoAP Decoder",
+      "type": "script",
+      "def": "exec.now('data', event.data.body)",
+      "filterServiceId": "6726387edaab4af297728a83",
+      "filterType": "coap-receive"
+    }
+  ]
+}
