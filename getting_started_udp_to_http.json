@@ -1,0 +1,56 @@
+{
+  "templateDef": [
+    {
+      "desc": "Data received will be sent via a POST request to the URL",
+      "type": "string",
+      "key": "destination_url",
+      "name": "Destination HTTP URL"
+    },
+    {
+      "desc": "Replace service in imported items",
+      "findService": "81418d0e1607815e03483843",
+      "key": "svc_dedicated_udp",
+      "name": "Select UDP Service"
+    },
+    {
+      "name": "Reply Secret",
+      "key": "reply_secret",
+      "desc": "This secret is used to send data back to the device.",
+      "value": "abc123",
+      "genString": 24
+    }
+  ],
+  "services": [
+    {
+      "id": "67eab6a6eb7a0983d387d06b",
+      "key": "http-sender",
+      "modelId": "81da3cb1d06f8a8fbbcbefad",
+      "name": "HTTP Sender",
+      "params": {
+        "endpoint_required": "false",
+        "webhook": "{{ .reply_secret }}"
+      }
+    }
+  ],
+  "triggerGlobals": [
+    {
+      "isSecret": false,
+      "key": "http_url",
+      "value": "{{.destination_url}}"
+    }
+  ],
+  "triggers": [
+    {
+      "def": "\r\n// modify the packet below with any new fields to send to the HTTP server.\r\nvar packet = {\r\n    remoteAddr: event.data.remoteAddr,\r\n    payload: event.data.payload,\r\n    ts: event.ts\r\n}\r\n\r\nhttp.post('http-sender', global.values.http_url, packet)",
+      "filterServiceId": "{{.svc_dedicated_udp}}",
+      "filterType": "udp-receive",
+      "id": "67eab73b5ad4f496dead89d2",
+      "name": "Getting Started: UDP to HTTP",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ]
+}

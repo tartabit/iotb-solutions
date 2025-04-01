@@ -1,0 +1,35 @@
+{
+  "templateDef": [
+    {
+      "desc": "CoAP Port to listen on",
+      "key": "port",
+      "name": "CoAP Port",
+      "value": "5683"
+    }
+  ],
+  "services": [
+    {
+      "id": "67ec2887e6ba66c11b003d4f",
+      "key": "coap-{{.port}}",
+      "modelId": "81450249962accd689c98bb5",
+      "name": "CoAP Listener ({{.port}})",
+      "params": {
+        "port": "{{.port}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "def": "var packet = Object.assign({}, event.data)\r\npacket['ts'] = event.ts\r\n\r\nexec.now('data', packet)",
+      "filterType": "coap-receive",
+      "filterServiceId": "67ec2887e6ba66c11b003d4f",
+      "id": "67ec29a0c0505ee035f5a628",
+      "name": "CoAP to Generic ({{.port}})",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ]
+}

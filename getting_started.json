@@ -1,0 +1,16 @@
+[
+  {
+    "leftImg": "/solutions/icons/generic-decoder.png",
+    "rightImg": "/solutions/icons/generic-webhook.png",
+    "title": "UDP to HTTP(S) Webhook",
+    "import": "/solutions/getting_started_udp_to_http.json",
+    "desc": "Package and send UDP data to a HTTPS webhook.",
+    "prereqs": [
+      "UDP Service",
+      "HTTP(S) webhook URL"
+    ],
+    "tags": [
+      "getting started"
+    ]
+  }
+]
