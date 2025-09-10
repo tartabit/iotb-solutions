@@ -2,6 +2,7 @@
   "getting_started.json",
   "lwm2m.json",
   "generic.json",
+  "compact-binary.json",
   "lora.json",
   "aws.json",
   "iridium.json",

@@ -1,5 +1,18 @@
 [
   {
+    "leftImg": "/solutions/icons/iot-bridge.png",
+    "rightImg": "/solutions/icons/aws-iot-core.png",
+    "title": "Setup AWS IoT Core",
+    "import": "/solutions/generic_to_aws-iot-setup.json",
+    "desc": "Configure AWS IoT Core's security policy.",
+    "prereqs": [
+      "AWS IoT Core"
+    ],
+    "tags": [
+      "aws"
+    ]
+  },
+  {
     "leftImg": "/solutions/icons/mqtt.png",
     "rightImg": "/solutions/icons/aws-iot-core.png",
     "title": "MQTT to AWS IoT Core",
