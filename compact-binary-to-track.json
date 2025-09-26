@@ -10,12 +10,7 @@
   "triggers": [
     {
       "def": "\r\n\r\nvar rec = {\r\n    name: event.endpoint.name,\r\n    values: {}\r\n}\r\n\r\nif (event.data.data.desc == 'telemetry') {\r\n    rec.location = {\r\n        lat: event.data.data.loc.lat,\r\n        lon: event.data.data.loc.lng,\r\n    },\r\n    rec.values.battery = event.data.data.values.battery\r\n    rec.values.temp = event.data.data.values.temp\r\n    rec.values.rssi = event.data.data.values.rssi\r\n\r\n    if (event.data.data.values.readings) {\r\n        event.data.data.values.readings.forEach(function (r) {\r\n            var reading = {\r\n                values: {\r\n                    temperature: (r.temperature * 3.0 / 2.0) + 32,\r\n                    humidity: r.humidity\r\n                }\r\n            }\r\n            track.publish('track', event.endpoint.key, r.ts, reading)\r\n        })\r\n    }\r\n\r\n} else if (event.data.data.desc == 'config') {\r\n    rec.values.server = event.data.data.values.server\r\n    rec.values.reportingInterval = event.data.data.values.reportingInterval\r\n    rec.values.readingInterval = event.data.data.values.readingInterval\r\n}\r\ntrack.publish('compact-udp-track', event.endpoint.key, event.ts, rec)\r\n",
-      "filterCustom": {
-        "key": {
-          "comp": "contains",
-          "value": "decoded"
-        }
-      },
+      "filterGeneric": "compact-binary-decoded",
       "filterType": "generic",
       "id": "689cd8e5000d74e174953793",
       "name": "Compact UDP Protocol - Send to Track",

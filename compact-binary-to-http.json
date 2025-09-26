@@ -21,12 +21,7 @@
   "triggers": [
     {
       "def": "\r\nif (event.endpoint) {\r\n  http.post('compact-udp-http-sender','{{.server}}' + '/' + event.endpoint.key + '/' + event.data.data.desc, event.data.data)\r\n} else {\r\n  http.post('compact-udp-http-sender','{{.server}}',event.data.data)\r\n}",
-      "filterCustom": {
-        "key": {
-          "comp": "contains",
-          "value": "decoded"
-        }
-      },
+      "filterGeneric": "compact-binary-decoded",
       "filterType": "generic",
       "id": "68a71ddc000d74e1749537de",
       "name": "Compact UDP Protocol - POST to HTTP Server",
