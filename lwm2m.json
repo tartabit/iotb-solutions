@@ -72,7 +72,7 @@
   },
   {
     "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/aws-iot.png",
+    "rightImg": "/solutions/icons/aws-iot-core.png",
     "title": "LWM2M to AWS IoT Core",
     "import": "/solutions/lwm2m_to_aws-iot.json",
     "desc": "Integrate LWM2M devices quickly to AWS IoT Core.",
