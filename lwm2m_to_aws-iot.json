@@ -1,0 +1,117 @@
+{
+  "templateDef": [
+    {
+      "name": "AWS IoT Core MQTT server",
+      "key": "mqtt_host",
+      "desc": "Enter the MQTT server address such as: mqtts://xxx.iot.eu-central-1.amazonaws.com:8883.",
+      "value": "mqtts://****.iot.**-central-1.amazonaws.com:8883"
+    }
+  ],
+  "services": [
+    {
+      "id": "68dd47183d37533463544d4d",
+      "key": "aws-iot-core",
+      "modelId": "81167b90ea08cf11a21bea40",
+      "name": "AWS IoT Core",
+      "params": {
+        "activity_timeout": "600",
+        "certificate": "-----BEGIN CERTIFICATE-----\nMIIDnTCCAoWgAwIBAgIUKsG2/k/TfDca5pf9U/nD9ZgdyD4wDQYJKoZIhvcNAQEL\nBQAwXjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAkZMMRMwEQYDVQQHDApCb2NhIFJh\ndG9uMRcwFQYDVQQKDA5UYXJ0YWJpdCwgTExDLjEUMBIGA1UEAwwLdGFydGFiaXRf\nY2EwHhcNMjQwMjEzMTU1NDE0WhcNMzQwMjEwMTU1NDE0WjBeMQswCQYDVQQGEwJV\nUzELMAkGA1UECAwCRkwxEzARBgNVBAcMCkJvY2EgUmF0b24xFzAVBgNVBAoMDlRh\ncnRhYml0LCBMTEMuMRQwEgYDVQQDDAt0YXJ0YWJpdF9jYTCCASIwDQYJKoZIhvcN\nAQEBBQADggEPADCCAQoCggEBALd27f8ZqKZJg9zDMJIh23ADDTY51F/PLfnSjh25\nirGEj9j4JkbXUIZrFhuRIAFmDOJMXBg/PDHEQUc1gETuq5JNQ8MZxXEzjBw04TMJ\n0mK8DAvDpTd0u+cd8V4D/QO08Q7qaDyQZqlrPlB/PZWLsId3VoQ/MAmnMzKEPuQ3\n/7AnMhUKyEpLuvAfaUeM0PdBy6bv/qX4WVWCBfOdnGIwdNnGU/ElJG032JcpEllu\nsqx/URVFU7Nw+Lggniy/vFGj8Lbh9yfgHG3+aK52H3hS2mNGt7RIs7T5cGADGB6g\nEKIKiiCcOginO2B/ZxRcNkuzBZh6sqdIE6MdZPeUsGYVBZ8CAwEAAaNTMFEwHQYD\nVR0OBBYEFLeI4C3gu2NbZeLnVpmRGAetiLjsMB8GA1UdIwQYMBaAFLeI4C3gu2Nb\nZeLnVpmRGAetiLjsMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEB\nADwtPalDNLlC0PkINaVdOmL2faMwgxWkAeDBHjtHBjmkFMYYfRkszakNyLZS5Mgk\nZuPSmhMxLA4rq49Ool/WafANjb2kQ3EEUf7ZajkN4kej3rADv22qfUMdYqxoKtQ6\nc2uy5aRJd68UIaLrzUR7IfNsTJstIYoJDHwUewUUn0w81itAJemOjCmogKGTAeN0\nfw+C3R9in1H1Loz6JedGbnARmxEHQ5X9gG44D68e1kSRd7VoGVxZUdN7kbOj0ZiM\nNF4zGQoGNlosjlpxN3yFXvrkV39nqm7Woq6/NAAxmsK1TSgXrU6bDiKL1TgnZ10V\n6Wij9VfKKzQ9e5jK+FtRO6k=\n-----END CERTIFICATE-----\n",
+        "classic_shadows": "false",
+        "mqtt_host": "{{.mqtt_host}}",
+        "mqtt_subscriptions": "lwm2m/[thingName]/write",
+        "private_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpQIBAAKCAQEAt3bt/xmopkmD3MMwkiHbcAMNNjnUX88t+dKOHbmKsYSP2Pgm\nRtdQhmsWG5EgAWYM4kxcGD88McRBRzWARO6rkk1DwxnFcTOMHDThMwnSYrwMC8Ol\nN3S75x3xXgP9A7TxDupoPJBmqWs+UH89lYuwh3dWhD8wCaczMoQ+5Df/sCcyFQrI\nSku68B9pR4zQ90HLpu/+pfhZVYIF852cYjB02cZT8SUkbTfYlykSWW6yrH9RFUVT\ns3D4uCCeLL+8UaPwtuH3J+Acbf5ornYfeFLaY0a3tEiztPlwYAMYHqAQogqKIJw6\nCKc7YH9nFFw2S7MFmHqyp0gTox1k95SwZhUFnwIDAQABAoIBAAn5akkDMRsRRhz7\nc6mOM6rsT4ySKkynK924J8fP7Y1nIpbuLs6NKDCWo9YN1sqcrLik5CDhVzlxbQcd\nDoMw4p0KnFOAFC7qWYSzD0dCEnERvinpkhLowsp240d0Og44iR6BefdI9nvhe7rO\noB+AP7GtuENqWAc+Utc9P1oS/VCrSTKbVgeFjndxAASwPujzqq9vh/Zhmv8L1kEH\nD2eLuAW1PuAePeAjS2MfWlooWzFf4MyfaHAbbvw5wiqUL8kNajUEQDgKYXRUVyDM\nHEoZmyxuW/YzF7hjXvVlkcIBU6tuLNEMk1z778IN9AtmHXvQTUo5UVv7wkpBWS3X\nDAq9mOkCgYEAxmIZeAPJ/nWqEY5hPIn8ejnuRwtCgr/m0LCKQ1cx96JqJbLfT6HF\nLKC0h6xo7xtOLSWm8WrYn0ukBO+VdCGBHJ7CaIpbYmSF4pqM2Aj+8lS5gTurEeG1\nKAN0+uYtBdvuFM08c2PBnGzUv8fgCNEvsGACsuIBsTAdZjGnoHrifhsCgYEA7L+f\nJNEP/80yDvZLlOpkKug2keO9kiMEqWFyA7bHDWM9rKwfUgBRJvBwRLrESKbiqwyP\nJb/NgufMifuKiMN8MNIuRPLVKaPj5+1Pliq4C4xABKOmVOljzLmiXVdESpf+seD2\nIKGkZmgnzu82ffSHa75aSIhWh/Qjvr3c1Sk6vs0CgYEAloXMiVFmrFofBl8fzE1u\nclcOQn16o7ZzrZil795zHU/wdlY4NjWqY+gz0lWw8Ouo73yIJNlLL+K2usAGiCz7\nx/l1zNhd6lQXeg6GG00IFFrQvgvGCzVUvN2SnuSS+MUc6k+nNG5WcxfofPNtO4Nt\nScgvhAcT/ZtiUy4N4CgdPk0CgYEAuttrMlXHuPAtyF1gvkJZmPv6xh7n6sW00jNV\nF9VVOh3P+c9IUSJq6r7u/XAjp+wAD100RmkiPWXSrD1a1CLmjGn3lvfKgrkWEmHd\nZPqGlKa3iHHZwD8NQ/JoUh+kiPN6VM7ntE2gQiuG7+8iJTuw/rsY6xKgqWFqLQwR\nljSaZykCgYEApXCuZV6eFiGHedZ2PMsDbIzTTBTyl+jr+LKBaxnFqvL0j/bPZDu0\nkAnyj9eOQymkCVOv8Hu/0czuHRNbu7DtUa655RAv1BLmvIolPVeSlhBs83/m3S+U\nLppngyCbL4gpdD20pq8ciHXpEKJYgtnxgF6ZRJmEErxaTtYYtGYtSUA=\n-----END RSA PRIVATE KEY-----\n"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "def": "// to write back to the device:\r\n// publish on topic: lwm2m/[thingName]/write\r\n// payload should be a JSON object like the following:\r\n// {\r\n//   \"3\": {\r\n//     \"0\": {\r\n//       \"15\": \"from AWS\"\r\n//     }\r\n//   }\r\n// }\r\n\r\nlwm2m.writeMulti(event.data.thingName,event.data.payload)\r\n",
+      "filterCustom": {
+        "topic": {
+          "comp": "contains",
+          "value": "/write"
+        }
+      },
+      "filterType": "aws-iot-core-publish-recv",
+      "id": "68dddb707b2f9fec7cbd05af",
+      "name": "AWS IoT Core - Write from topic",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "// to write back to the device:\r\n// job template must contain a set of resources to write.\r\n// payload should be a JSON object like the following:\r\n// {\r\n//   \"3\": {\r\n//     \"0\": {\r\n//       \"15\": \"from AWS\"\r\n//     }\r\n//   }\r\n// }\r\naws_iot.job_update('aws-iot-core',event.data.thingName, event.data.jobId, 86400*3, {'status': 'initiating-write'})\r\nlwm2m.writeMulti(event.data.thingName,event.data.jobDocument, {async: true, context: {jobId: event.data.jobId}} )\r\n\r\n",
+      "filterType": "aws-iot-core-job-changed",
+      "id": "68dde209f625d3e943a213e7",
+      "name": "AWS IoT Core - Write from job",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "if(event.data.intermediate === true) {\r\n    aws_iot.job_update('aws-iot-core', event.endpoint.key, event.data.context.jobId, 86400*2, {'status':'queued'})\r\n} else if(event.data.success === true) {\r\n    aws_iot.job_complete('aws-iot-core', event.endpoint.key, event.data.context.jobId, true, {'status':'success'})\r\n} else {\r\n    aws_iot.job_complete('aws-iot-core', event.endpoint.key, event.data.context.jobId, false, {'status':event.data.error})\r\n}\r\n",
+      "filterCustom": {
+        "context.jobId": {
+          "comp": "exists",
+          "value": ""
+        }
+      },
+      "filterType": "lwm2m-result",
+      "id": "68dde3b2f625d3e943a229c3",
+      "name": "AWS IoT Core - Update Job",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "// add any objects here you want to monitor and save as shadows\r\nvar objectList = {\r\n    'device_3': true\r\n}\r\n\r\nvar objs = Object.keys(event.data.data)\r\nobjs.forEach(function(obj) {\r\n    if(objectList[obj]) {\r\n        var insts = Object.keys(event.data.data[obj])\r\n        insts.forEach(function(inst) {\r\n            aws_iot.shadow_update('aws-iot-core', event.endpoint.key, obj + '_' + inst, event.data.data[obj][inst], null)\r\n        })\r\n    }\r\n})\r\n",
+      "filterType": "lwm2m-data",
+      "id": "68ddd5607b2f9fec7cbcbd28",
+      "name": "AWS IoT Core - Publish Objects as Shadows",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "aws_iot.publish('aws-iot-core',event.endpoint.key, 'lwm2m/[thingName]/update', event.data)",
+      "filterType": "lwm2m-update",
+      "id": "68dd4b1a7b2f9fec7cb64dfc",
+      "name": "AWS IoT Core - On Update",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "aws_iot.publish('aws-iot-core',event.endpoint.key, 'lwm2m/[thingName]/register', event.data)",
+      "filterType": "lwm2m-register",
+      "id": "68dd47183d37533463544d53",
+      "name": "AWS IoT Core - On Registration",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "var objs = Object.keys(event.data.data)\r\nobjs.forEach(function(obj) {\r\n    var insts = Object.keys(event.data.data[obj])\r\n    insts.forEach(function(inst) {\r\n        aws_iot.publish('aws-iot-core',event.endpoint.key, 'lwm2m/[thingName]/data/'+obj+'/'+inst, event.data.data[obj][inst])\r\n    })\r\n})\r\n",
+      "filterType": "lwm2m-data",
+      "id": "68ddda0ef625d3e943a1ae53",
+      "name": "AWS IoT Core - On Data",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ]
+}
