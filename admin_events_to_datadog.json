@@ -1,0 +1,42 @@
+{
+  "services": [
+    {
+      "id": "696f88e254f73ea6fcae96b3",
+      "key": "datadog-http",
+      "modelId": "81da3cb1d06f8a8fbbcbefad",
+      "name": "Datadog Log Export"
+    }
+  ],
+  "triggers": [
+    {
+      "def": "// monitor the event history and send log messages to data dog.\r\n\r\nif (!global.values.datadogConfig) {\r\n    log.warn('config global variable is missing')\r\n    trigger.exit()\r\n}\r\n\r\nif (!global.values.datadogLastTs ) {\r\n    log.warn('last ts global variable is missing, initializing')\r\n    global.set('datadogLastTs', event.ts)\r\n    trigger.exit()\r\n}\r\n\r\nvar search = 'ts>date(\"' + global.values.datadogLastTs + '\")'\r\n\r\n\r\nif (global.values.datadogConfig.filterQuery && global.values.datadogConfig.filterQuery != '') {\r\n    search += global.values.datadogConfig.filterQuery\r\n}\r\n\r\n// you can add any other filters here, syntax is the same as the search bar in the Event History.\r\n// search += '&& type==\"generic\"'\r\n\r\nvar events = []\r\nvar lastTs = ''\r\nvar firstTs = ''\r\nfunction appendEvent(evt) {\r\n    var msg = Object.assign({}, global.values.datadogConfig.base)\r\n    msg.message = 'event ' + evt.type\r\n    msg['event'] = evt\r\n    //msg['timestamp'] = evt.ts\r\n    if (firstTs == '') {\r\n        firstTs = evt.ts\r\n    }\r\n    events.push(msg)\r\n    lastTs = evt.ts\r\n}\r\n\r\nvar next = undefined\r\nwhile (true) {\r\n    next = history.search(search, appendEvent, { limit: 100, next: next })\r\n    if (next == 'done') {\r\n        break\r\n    }\r\n}\r\n\r\nif (events.length === 0) {\r\n    log.trace('no new events', search)\r\n    trigger.exit()\r\n}\r\n\r\nvar headers = {\r\n    'Content-Type': 'application/json',\r\n    'DD-API-KEY': global.values.datadogConfig.apiKey\r\n}\r\n\r\n//log.trace('sending ' + events.length + ' logs last ts: ' + date.format(lastTs, 'iso8601') + ' first ts: ' + date.format(firstTs, 'iso8601'))\r\n\r\nvar rsp = http.post('datadog-http', global.values.datadogConfig.url + '/api/v2/logs', events, { 'headers': headers, 'gzip': true })\r\n\r\n//log.trace('received response', rsp)\r\n\r\nglobal.set('datadogLastTs', date.format(firstTs,'iso8601'))\r\n",
+      "filterCron": "* * * * *",
+      "filterType": "cron-event",
+      "id": "696f8ec4c40914f377c120ca",
+      "name": "Send events to Data Dog",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ],
+  "triggerGlobals": [
+    {
+      "importProtect": true,
+      "isSecret": false,
+      "key": "datadogConfig",
+      "value": {
+        "apiKey": "<apikey>",
+        "base": {
+          "ddsource": "iot-bridge",
+          "ddtags": "app:myapp",
+          "hostname": "iot-bridge",
+          "service": "trigger"
+        },
+        "filterQuery": "",
+        "url": "https://http-intake.logs.<region>.datadoghq.com"
+      }
+    }
+  ]
+}

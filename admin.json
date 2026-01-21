@@ -10,5 +10,17 @@
     "tags": [
       "admin"
     ]
+  },
+  {
+    "leftImg": "/solutions/icons/iot-bridge.png",
+    "rightImg": "/solutions/icons/datadog.png",
+    "title": "Send events to Data Dog logs",
+    "import": "/solutions/admin_events_to_datadog.json",
+    "desc": "Send events to Data Dog's logging service.",
+    "prereqs": [
+    ],
+    "tags": [
+      "admin"
+    ]
   }
 ]
