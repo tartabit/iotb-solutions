@@ -27,7 +27,7 @@
       "isSecret": false,
       "key": "datadogConfig",
       "value": {
-        "apiKey": "<apikey>",
+        "apiKey": "{{.apiKey}}",
         "base": {
           "ddsource": "iot-bridge",
           "ddtags": "app:myapp",
@@ -35,8 +35,21 @@
           "service": "trigger"
         },
         "filterQuery": "",
-        "url": "https://http-intake.logs.<region>.datadoghq.com"
+        "url": "https://http-intake.logs.{{.region}}.datadoghq.com"
       }
     }
-  ]
+  ],
+  "templateDef": [
+  {
+    "name": "Data Dog API Key",
+    "key": "apiKey",
+    "desc": "API key for your datadog account."
+  },
+  {
+    "name": "Region",
+    "key": "region",
+    "value": "us5",
+    "desc": "Region your Data Dog instance is allocated."
+  }
+]
 }
