@@ -1,17 +1,13 @@
 [
-  "getting_started.json",
-  "lwm2m.json",
-  "generic.json",
-  "compact-binary.json",
-  "lora.json",
-  "aws.json",
-  "iridium.json",
-  "micron.json",
-  "murata.json",
-  "sequans.json",
-  "nimbelink.json",
-  "queclink.json",
-  "admin.json",
-  "cdp_1nce.json",
-  "cdp_bics.json"
-]
+    "lwm2m.json",
+    "udp.json",
+    "compact-binary.json",
+    "queclink.json",
+    "stsunlab.json",
+    "globalstar.json",
+    "iridium.json",
+    "viasat.json",
+    "generic.json",
+    "cdp.json",
+    "admin.json"
+  ]

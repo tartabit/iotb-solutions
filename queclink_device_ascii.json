@@ -1,0 +1,23 @@
+{
+  "endpoints": [
+    {
+      "key": "{{.key}}",
+      "name": "{{.key}}",
+      "serviceId": "{{.svc}}"
+    }
+  ],
+  "templateDef": [
+    {
+      "name": "Device IMEI",
+      "key": "key",
+      "desc": "The IMEI of the Queclink device.",
+      "value": "<imei>"
+    },
+    {
+      "desc": "Select a Queclink listener.",
+      "findService": "81418d0e1607815e03483843",
+      "key": "svc",
+      "name": "Queclink UDP Listener"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="240" fill="#FFFFFF"></rect>
+  <circle cx="120" cy="120" r="92" fill="#d0e5f9"></circle>
+
+  <!-- Uncompressed blocks -->
+  <rect x="64" y="76" width="18" height="84" rx="3" fill="none" stroke="#1F2A44" stroke-width="4"></rect>
+  <rect x="92" y="76" width="18" height="84" rx="3" fill="none" stroke="#1F2A44" stroke-width="4"></rect>
+  <rect x="120" y="76" width="18" height="84" rx="3" fill="none" stroke="#1F2A44" stroke-width="4"></rect>
+
+  <!-- Compression squeeze (restored to the original symmetric geometry) -->
+  <line x1="72" y1="118" x2="112" y2="118" stroke="#ff1f1a" stroke-width="4" stroke-linecap="round"></line>
+  <line x1="176" y1="118" x2="136" y2="118" stroke="#ff1f1a" stroke-width="4" stroke-linecap="round"></line>
+
+  <!-- Compact block -->
+  <rect x="152" y="92" width="22" height="52" rx="6" fill="#ff1f1a"></rect>
+
+  <!-- Binary dots -->
+  <circle cx="163" cy="104" r="3" fill="#1F2A44"></circle>
+  <circle cx="163" cy="118" r="3" fill="#1F2A44"></circle>
+  <circle cx="163" cy="132" r="3" fill="#1F2A44"></circle>
+
+  <!-- Label (inside circle) -->
+  <text x="120" y="185" text-anchor="middle" font-family="Raleway, Arial, sans-serif" font-size="22" font-weight="600" fill="#1F2A44">
+    Compact Binary
+  </text>
+</svg>

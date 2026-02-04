@@ -1,6 +1,12 @@
 {
   "templateDef": [
     {
+      "name": "Generic Event",
+      "key": "generic_event",
+      "desc": "Generic event to watch to send data..",
+      "type": "generic-key"
+    },
+    {
       "name": "Workspace ID",
       "key": "workspace_id",
       "desc": "Enter the workspace ID of the Log Analytics workspace."
@@ -32,11 +38,11 @@
   "triggers": [
     {
       "id": "61ba5155166ddab0cfbfdb91",
-      "name": "Send to Log Analytics",
+      "name": "{{.generic_event}} - Send to Log Analytics",
       "type": "script",
       "def": "log_analytics.publish('azure-log-analytics','{{.log_name}}',event.ts,event.data.data)",
       "filterType": "generic",
-      "filterGeneric": "data"
+      "filterGeneric": "{{.generic_event}}"
     }
   ]
 }

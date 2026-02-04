@@ -1,0 +1,71 @@
+{
+  "templateDef": [
+    {
+      "desc": "Your Viasat virtual APN.",
+      "type": "string",
+      "key": "virtual_apn",
+      "name": "Virtual APN",
+      "value": "iotbridge.nidd"
+    },
+    {
+      "desc": "Your Viasat API Key.",
+      "type": "secret",
+      "key": "api_key",
+      "name": "API Key",
+      "value": ""
+    },
+    {
+      "desc": "Your Viasat APP Secret Key.",
+      "type": "secret",
+      "key": "cb_api_key",
+      "name": "CB API Key",
+      "value": ""
+    }
+  ],
+  "services": [
+    {
+      "id": "6931cde18b2a3ee0c4ffaab5",
+      "key": "viasat-link",
+      "modelId": "814072e67fc67644eba5e0d8",
+      "name": "Viasat - NIDD Connector",
+      "params": {
+        "api_key": "{{.api_key}}",
+        "app_secret_key": "{{.cb_api_key}}",
+        "cb_api_key": "{{.cb_api_key}}",
+        "virtual_apn": "{{.virtual_apn}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "def": "\r\nviasat.niddSend('viasat-link', event.endpoint.key, event.data.data.message)",
+      "filterGeneric": "vissat-send-downlink",
+      "filterType": "generic",
+      "genericSample": "{\n  \"form\": true,\n   \"title\": \"Send NIDD downlink\",\n   \"desc\": \"Send a downlink message via NIDD\",\n   \"icon\": \"mdi-download-box\",\n   \"endpoint\":{ \"required\": true },\n   \"fields\": [\n      { \"name\": \"Message\", \"key\": \"message\"}\n   ]\n}",
+      "id": "69337aa16c440a4cda61d760",
+      "name": "Viasat - Send Downlink",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\n// set the correct data format, text, json, cbor, binary\r\nvar dataFormat = 'text'\r\n\r\nvar obj = undefined\r\nif (dataFormat === 'cbor') {\r\n    // convert the CBOR encoded payload into a standard object\r\n\r\n    obj = convert.cborToObject(event.data.data)\r\n\r\n} else if (dataFormat === 'binary') {\r\n    // dynamically parse binary content in the payload\r\n    // example is 2 bytes for temp, 2 bytes for humidity both as uint16 values, divide by 10 for a float.\r\n\r\n    var rdr = convert.bitReader(event.data.data)\r\n    obj['temp'] = rdr.readUint16() / 10\r\n    obj['hum'] = rdr.readUint16() / 10\r\n\r\n} else {\r\n    // text, json, or just plain bytes can be handled raw\r\n    \r\n    obj = event.data.data\r\n}\r\n\r\nexec.now('viasat-received', obj)\r\n",
+      "filterType": "viasat-nidd-uplink",
+      "id": "69371a07f3b041a180f98262",
+      "name": "Viasat - Received Message",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ],
+  "triggerGlobals": null,
+  "lwm2mObjDefs": null,
+  "reports": null,
+  "geofences": null,
+  "locationAccessPoints": null,
+  "dashboards": null
+}

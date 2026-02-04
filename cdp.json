@@ -1,0 +1,54 @@
+[
+  {
+    "class": "cdp-connector",
+    "key": "cdp-1nce-quickstart",
+    "version": "1",
+    "leftImg": "/solutions/icons/cdp-1nce.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "1NCE Quickstart",
+    "import": "/solutions/cdp_1nce_quickstart.json",
+    "desc": "Connect to the 1NCE Portal.",
+    "tags": [
+      "cdp"
+    ]
+  },
+  {
+    "class": "cdp-connector",
+    "key": "cdp-aeris-quickstart",
+    "version": "1",
+    "leftImg": "/solutions/icons/cdp-aeris.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "Aeris IOTA Quickstart",
+    "import": "/solutions/cdp_aeris_iota_quickstart.json",
+    "desc": "Connect to the Aeris IOT Accelerator platform.",
+    "tags": [
+      "cdp"
+    ]
+  },
+  {
+    "class": "cdp-connector",
+    "key": "cdp-bics-quickstart",
+    "version": "1",
+    "leftImg": "/solutions/icons/cdp-bics.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "BICS Quickstart",
+    "import": "/solutions/cdp_bics_quickstart.json",
+    "desc": "Connect to the BICS Portal.",
+    "tags": [
+      "cdp"
+    ]
+  },
+  {
+    "class": "cdp-connector",
+    "key": "cdp-cisco-quickstart",
+    "version": "1",
+    "leftImg": "/solutions/icons/cdp-cisco.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "Cisco Control Center Quickstart",
+    "import": "/solutions/cdp_cisco_quickstart.json",
+    "desc": "Connect to a Cisco Control Center account.",
+    "tags": [
+      "cdp"
+    ]
+  }
+]

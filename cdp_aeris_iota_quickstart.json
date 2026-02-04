@@ -1,0 +1,50 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    },
+    {
+      "name": "API Username",
+      "key": "api_user",
+      "desc": "IOTA API username.",
+      "value": ""
+    },
+    {
+      "name": "API Password",
+      "type": "secret",
+      "key": "api_pass",
+      "desc": "IOTA API password.",
+      "value": ""
+    },
+    {
+      "name": "Customer Number",
+      "type": "string",
+      "key": "customer_number",
+      "desc": "IOTA customer number.",
+      "value": ""
+    }
+  ],
+  "services": [
+    {
+      "id": "68a5e5ee31c9d8ba88088514",
+      "key": "{{.prefix}}-iota}}",
+      "modelId": "81d0f2006892493c441ffc17",
+      "name": "Aeris IOTA Connector ({{.prefix}})",
+      "params": {
+        "api_password": "{{.api_pass}}",
+        "api_user": "{{.api_user}}",
+        "base_api_url": "https://iot-api.aeris.com",
+        "customer_number": "{{.customer_number}}",
+        "endpoint_lookup": "none",
+        "ignore_no_endpoints": "false",
+        "ignore_unused": "true",
+        "sync_endpoint_storage": "true",
+        "sync_events": "true",
+        "target_sync_hour": "9"
+      }
+    }
+  ]
+}

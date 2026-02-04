@@ -1,159 +1,83 @@
 [
   {
+    "class": "device-connector",
+    "key": "lwm2m-quickstart",
+    "version": "1",
     "leftImg": "/solutions/icons/lwm2m.png",
     "rightImg": "/solutions/icons/iot-bridge.png",
     "title": "LWM2M Quickstart",
     "import": "/solutions/lwm2m_quickstart.json",
     "desc": "Setup basic reads/observes on LWM2M devices.",
-    "prereqs": [
-      "LWM2M device"
-    ],
+    "details": "/solutions/lwm2m_quickstart.md",
     "tags": [
-      "lwm2m"
+      "lwm2m",
+      "device connector"
     ]
   },
   {
+    "class": "device-onboarding",
+    "key": "lwm2m-onboarding-nosec",
+    "version": "1",
     "leftImg": "/solutions/icons/lwm2m.png",
     "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "LWM2M Device Validator",
-    "import": "/solutions/lwm2m_validator.json",
-    "desc": "Validate functionality in LWM2M clients.",
-    "prereqs": [
-      "LWM2M device"
-    ],
+    "title": "Onboard LWM2M client without security",
+    "import": "/solutions/lwm2m_device_nosec.json",
+    "desc": "Onboard a LWM2M client that doesn't use DTLS security.",
     "tags": [
       "lwm2m"
     ]
   },
   {
+    "class": "device-onboarding",
+    "key": "lwm2m-onboarding-psk",
+    "version": "1",
     "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/azure-iot.png",
-    "title": "LWM2M to Azure IoT Hub",
-    "import": "/solutions/lwm2m_to_azure-iot.json",
-    "desc": "Integrate LWM2M devices quickly to Azure IoT Hub.",
-    "prereqs": [
-      "IoT Hub and service account connection string",
-      "LWM2M device"
-    ],
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "Onboard LWM2M client with PSK",
+    "import": "/solutions/lwm2m_device_psk.json",
+    "desc": "Onboard a LWM2M client that uses DTLS with PSK.",
     "tags": [
-      "lwm2m",
-      "azure"
+      "lwm2m"
     ]
   },
   {
-    "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/azure-iot-central.png",
-    "title": "LWM2M to Azure IoT Central",
-    "import": "/solutions/lwm2m_to_azure-iot-central.json",
-    "desc": "Integrate LWM2M devices quickly to Azure IoT Central.",
-    "prereqs": [
-      "IoT Central and DPS credentials",
-      "LWM2M device"
-    ],
-    "tags": [
-      "lwm2m",
-      "azure"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/azure-digital-twins.png",
-    "title": "LWM2M to Azure Digital Twins",
-    "import": "/solutions/lwm2m_to_azure-digital-twins.json",
-    "desc": "Integrate LWM2M devices quickly to Microsoft Azure IoT Hub.",
-    "prereqs": [
-      "Azure Digital Twin instance",
-      "LWM2M device"
-    ],
-    "tags": [
-      "lwm2m",
-      "azure"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/aws-iot-core.png",
-    "title": "LWM2M to AWS IoT Core",
-    "import": "/solutions/lwm2m_to_aws-iot.json",
-    "desc": "Integrate LWM2M devices quickly to AWS IoT Core.",
-    "prereqs": [
-      "AWS IoT Core",
-      "LWM2M device"
-    ],
-    "tags": [
-      "lwm2m",
-      "aws"
-    ]
-  },
-  {
+    "class": "device-features",
     "leftImg": "/solutions/icons/lwm2m.png",
     "rightImg": "/solutions/icons/iot-bridge.png",
     "title": "LWM2M Bootstrap Examples",
     "import": "/solutions/lwm2m_bootstrap.json",
     "desc": "Example bootstrap triggers for single and multi-servers.",
-    "prereqs": [
-      "LWM2M device that supports DTLS and PSK encryption"
-    ],
+    "details": "/solutions/lwm2m_bootstrap.md",
     "tags": [
       "lwm2m"
     ]
   },
   {
-    "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/generic-webhook.png",
-    "title": "Publish LWM2M data to HTTP(S) webhooks",
-    "import": "/solutions/lwm2m_to_webhook.json",
-    "desc": "Publish LWM2M data to HTTP Webhooks.",
-    "prereqs": [
-      "LWM2M device"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/track.png",
-    "title": "Publish LWM2M data to Track",
-    "import": "/solutions/lwm2m_to_track.json",
-    "desc": "Publish LWM2M data to Tartabit Track.",
-    "prereqs": [
-      "LWM2M device"
-    ],
-    "tags": [
-      "lwm2m",
-      "track"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/report.png",
-    "title": "LWM2M Connectivity Report",
-    "import": "/solutions/lwm2m_connectivity_report.json",
-    "desc": "LWM2M connectivity report template.",
-    "prereqs": [
-      "LWM2M device"
-    ],
-    "tags": [
-      "lwm2m",
-      "reporting"
-    ]
-  },
-  {
+    "class": "device-features",
     "leftImg": "/solutions/icons/lwm2m.png",
     "rightImg": "/solutions/icons/fota.png",
     "title": "LWM2M FOTA Quickstart",
     "import": "/solutions/lwm2m_fota_quickstart.json",
     "desc": "LWM2M firmware report template.",
-    "prereqs": [
-      "LWM2M device"
-    ],
     "tags": [
       "lwm2m",
       "reporting"
     ]
   },
   {
+    "class": "cloud-connector",
+    "leftImg": "/solutions/icons/lwm2m.png",
+    "rightImg": "/solutions/icons/azure-iot.png",
+    "title": "LWM2M to Azure IoT Hub",
+    "import": "/solutions/lwm2m_to_azure-iot.json",
+    "desc": "Integrate LWM2M devices quickly to Azure IoT Hub.",
+    "tags": [
+      "lwm2m",
+      "azure"
+    ]
+  },
+  {
+    "class": "cloud-connector-features",
     "leftImg": "/solutions/icons/lwm2m.png",
     "rightImg": "/solutions/icons/azure-iot.png",
     "title": "LWM2M FOTA with Azure IoT Hub",
@@ -170,187 +94,72 @@
     ]
   },
   {
+    "class": "cloud-connector",
     "leftImg": "/solutions/icons/lwm2m.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard LWM2M Client",
-    "import": "/solutions/lwm2m_import.json",
-    "desc": "Import LWM2M client to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "LWM2M device"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/ardesco.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Ardesco Tracker",
-    "import": "/solutions/ardesco_import.json",
-    "desc": "Import Ardesco device to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Ardesco device"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/monoz-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard MonoZero BG96 Board",
-    "import": "/solutions/monoz_import.json",
-    "desc": "Import MonoZero device to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "MonoZero BG96 device"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/nordic-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Nordic 9160",
-    "import": "/solutions/nordic_import.json",
-    "desc": "Import Nordic 9160 modules to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Nordic module"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/nordic-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Nordic Developer Kit",
-    "import": "/solutions/nordic_import.json",
-    "desc": "Import Nordic 9160 developer kits to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Nordic module"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/nordic-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Nordic Thingy91",
-    "import": "/solutions/nordic_import.json",
-    "desc": "Import Nordic Thiny91 devices to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Nordic module"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/quectel-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Quectel BC66/BC66-NA",
-    "import": "/solutions/quectel-bc66_import.json",
-    "desc": "Import Quectel module to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Quectel BC66 or BC66-NA module"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/quectel-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Quectel BG96",
-    "import": "/solutions/quectel-bg96_import.json",
-    "desc": "Import Quectel module to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Quectel BG96 module"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/quectel-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Quectel BG96 Developer Kit",
-    "import": "/solutions/quectel-bg96_import.json",
-    "desc": "Import Quectel module to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Quectel BG96 module"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/stmicro-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard B-U585I-IOT02A Discovery Kit",
-    "import": "/solutions/stm32u5_import.json",
-    "desc": "Import STMicro U5 discovery kit.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "B-U585I-IOT02A discovery kit",
-      "Quectel BG96 communication board"
-    ],
-    "tags": [
-      "lwm2m"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/stmicro-logo.png",
-    "rightImg": "/solutions/icons/azure-iot-central.png",
-    "title": "B-U585I-IOT02A to Azure IoT Central",
-    "import": "/solutions/stm32u5_to_azure-iot-central.json",
-    "desc": "End to end STM32U5 dev kit to IoT Central demo.",
-    "prereqs": [
-      "IoT Central and DPS credentials",
-      "STM32U5 development kit"
-    ],
+    "rightImg": "/solutions/icons/aws-iot-core.png",
+    "title": "LWM2M to AWS IoT Core",
+    "import": "/solutions/lwm2m_to_aws-iot.json",
+    "desc": "Integrate LWM2M devices quickly to AWS IoT Core.",
     "tags": [
       "lwm2m",
-      "azure"
+      "aws"
     ]
   },
+
   {
-    "leftImg": "/solutions/icons/telit-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Telit xEx10",
-    "import": "/solutions/telit_import.json",
-    "desc": "Import Telit module to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Telit module"
-    ],
+    "class": "cloud-connector",
+    "leftImg": "/solutions/icons/lwm2m.png",
+    "rightImg": "/solutions/icons/generic-webhook.png",
+    "title": "LWM2M data to HTTP(S)",
+    "import": "/solutions/lwm2m_to_webhook.json",
+    "desc": "Publish LWM2M data to HTTP Webhooks.",
     "tags": [
       "lwm2m"
     ]
   },
   {
-    "leftImg": "/solutions/icons/telit-logo.png",
-    "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Onboard Telit Bravo",
-    "import": "/solutions/telit_import.json",
-    "desc": "Import Telit Bravo development kit to an existing service.",
-    "prereqs": [
-      "Existing LWM2M service defined in account",
-      "Telit Bravo development kit"
-    ],
+    "class": "iot-bridge-features",
+    "leftImg": "/solutions/icons/lwm2m.png",
+    "rightImg": "/solutions/icons/track.png",
+    "title": "Publish LWM2M data to Track",
+    "import": "/solutions/lwm2m_to_track.json",
+    "desc": "Publish LWM2M data to Tartabit Track.",
     "tags": [
       "lwm2m"
     ]
-  }
+  },
+  {
+    "class": "iot-bridge-features",
+    "leftImg": "/solutions/icons/lwm2m.png",
+    "rightImg": "/solutions/icons/report.png",
+    "title": "LWM2M Connectivity Report",
+    "import": "/solutions/lwm2m_connectivity_report.json",
+    "desc": "LWM2M connectivity report template.",
+    "tags": [
+      "lwm2m",
+      "reporting"
+    ]
+  },
+  {
+  "class": "special-use",
+  "leftImg": "/solutions/icons/lwm2m.png",
+  "rightImg": "/solutions/icons/iot-bridge.png",
+  "title": "LWM2M Device Validator",
+  "import": "/solutions/lwm2m_validator.json",
+  "desc": "Stand-alone project to validate functionality in LWM2M clients.",
+  "tags": [
+    "lwm2m"
+  ]
+},{
+  "class": "cloud-connector-deprecated",
+  "leftImg": "/solutions/icons/lwm2m.png",
+  "rightImg": "/solutions/icons/azure-digital-twins.png",
+  "title": "LWM2M to Azure Digital Twins",
+  "import": "/solutions/lwm2m_to_azure-digital-twins.json",
+  "desc": "Integrate LWM2M devices quickly to Microsoft Azure IoT Hub.",
+  "tags": [
+    "lwm2m",
+    "azure"
+  ]
+}
 ]

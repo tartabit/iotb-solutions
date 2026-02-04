@@ -1,0 +1,18 @@
+[
+  {
+    "class": "device-connector",
+    "key": "stsublab-quickstart",
+    "version": "1",
+    "vendor": "ST-SUNLAB",
+    "leftImg": "/solutions/icons/stsunlab.png",
+    "rightImg": "/solutions/icons/iot-bridge.png",
+    "title": "ST SUNLAB Quickstart",
+    "import": "/solutions/stsunlab_quickstart.json",
+    "desc": "Connect ST SUNLAB devices via UDP.",
+    "details": "/solutions/stsunlab_quickstart.md",
+    "tags": [
+      "st-sunlab",
+      "device connector"
+    ]
+  }
+]

@@ -1,43 +1,16 @@
 [
   {
+    "class": "device-connector",
+    "key": "compact-binary-protocol-quickstart",
+    "version": "1",
     "leftImg": "/solutions/icons/generic-decoder.png",
     "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Compact Binary protocol decoder",
-    "import": "/solutions/compact-binary-protocol-shared.json",
+    "title": "Compact Binary Protocol Quickstart",
+    "import": "/solutions/compact-binary-protocol-quickstart.json",
     "desc": "Basic decoder for the compact-binary-protocol.",
-    "prereqs": [
-      "Device supporting compact binary protocol"
-    ],
-    "tags": [
-      "compact-binary"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/iot-bridge.png",
-    "rightImg": "/solutions/icons/generic-webhook.png",
-    "title": "Compact Binary protocol to HTTP",
-    "import": "/solutions/compact-binary-to-http.json",
-    "desc": "Send decoded messages to HTTP endpoint.",
-    "prereqs": [
-      "Device supporting compact binary protocol",
-      "HTTP server"
-    ],
-    "tags": [
-      "compact-binary"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/iot-bridge.png",
-    "rightImg": "/solutions/icons/track.png",
-    "title": "Compact Binary protocol to Track",
-    "import": "/solutions/compact-binary-to-track.json",
-    "desc": "Send decoded messages to Track.",
-    "prereqs": [
-      "Device supporting compact binary protocol"
-    ],
     "tags": [
       "compact-binary",
-      "track"
+      "device connector"
     ]
   }
 ]
