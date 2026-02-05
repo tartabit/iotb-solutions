@@ -10,6 +10,7 @@
     "viasat.json",
     "generic.json",
     "cdp.json",
+    "learning.json",
     "admin.json"
   ],
   "sections": [
