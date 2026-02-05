@@ -1,0 +1,60 @@
+{
+  "triggers": [
+    {
+      "def": "\r\n// queue the items to be processed.\r\nfor (var i = 0; i < event.data.data.count; i++) {\r\n    var item = Object.assign({}, event.data.data.item)\r\n    item.idx = i\r\n    item.rand = random.string(8)\r\n    queue.put(event.data.data.queue, item)\r\n}\r\n\r\n// after loading a number of items in the queue, start the workers to process them, this allows for limited parallel processing.\r\nfor (var w = 0; w < event.data.data.workers; w++) {\r\n    exec.now('queue-worker', { queue: event.data.data.queue })\r\n}\r\n\r\n",
+      "filterGeneric": "queue-put-worker",
+      "filterType": "generic",
+      "genericSample": "{\n \"queue\": \"my-queue2\",\n \"count\": 1000,\n \"workers\": 3,\n  \"item\":{\n    \"abc\": \"def\"\n  }\n}",
+      "id": "69836e046e3d9a547877e7b6",
+      "name": "Worker - Queue Writer",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\nvar count = 0\r\n\r\n// When this trigger starts, it can process items using queue.get() until null is returned indicating there are no more items.\r\n\r\nwhile(true) {\r\n    var item = queue.get(event.data.data.queue)\r\n    if (item == null) {\r\n        log.trace('finished after processing ' + count + ' items')\r\n        trigger.exit()\r\n    }\r\n    count++\r\n    // do something with the item\r\n}\r\n",
+      "filterGeneric": "queue-worker",
+      "filterType": "generic",
+      "genericSample": "{\n  \"queue\":\"my-queue\"\n}",
+      "id": "69836dae6e3d9a547877e79d",
+      "name": "Worker - Queue Handler",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\n// write a number of events to a queue, set {event: true} to trigger the `queue-activity` event to be generated.\r\nfor (var i = 0; i < event.data.data.count; i++) {\r\n    var item = Object.assign({}, event.data.data.item)\r\n    item.idx = i\r\n    item.rand = random.string(8)\r\n    queue.put(event.data.data.queue, item,{event:true})\r\n}\r\n",
+      "filterGeneric": "queue-put-event",
+      "filterType": "generic",
+      "genericSample": "{\n \"queue\": \"my-queue\",\n \"count\": 5,\n  \"item\":{\n    \"abc\": \"def\"\n  }\n}",
+      "id": "66fd65f434ae64024acac41e",
+      "name": "Event - Queue Writer",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\n// event fires when there is activity on the queue.  Make sure to add a filter on the queue name, \r\n// otherwise you may get this event for all queues in your account.\r\n\r\nlog.trace('item', event.data)\r\ntrigger.sleep(5000)\r\n\r\n// you must reply to the event for the next event to be sent.\r\ntrigger.reply({})",
+      "filterCustom": {
+        "queue": {
+          "comp": "eq",
+          "value": "my-queue"
+        }
+      },
+      "filterType": "queue-activity",
+      "id": "66fd67d644b13a7eafc256a5",
+      "name": "Event - Handle Event",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ]
+}

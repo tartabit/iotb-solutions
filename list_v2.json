@@ -41,6 +41,10 @@
       "logo": "/solutions/icons/generic-sim-mgmt.png"
     },
     {
+      "tags": ["learning"],
+      "logo": "/solutions/icons/iot-bridge-learning.png"
+    },
+    {
       "tags": ["admin"],
       "logo": "/solutions/icons/iot-bridge-admin.png"
     },

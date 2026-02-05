@@ -1,0 +1,15 @@
+[
+  {
+    "class": "iot-bridge-features",
+    "key": "learning-trigger-queues",
+    "version": "1",
+    "img": "/solutions/icons/iot-bridge.png",
+    "title": "Learn about Trigger Queues",
+    "import": "/solutions/learning_trigger_queues.json",
+    "desc": "Learn how to use queues in triggers.",
+    "details": "/solutions/learning_trigger_queues.md",
+    "tags": [
+      "learning"
+    ]
+  }
+]
