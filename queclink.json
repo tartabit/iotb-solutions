@@ -1,55 +1,47 @@
 [
   {
+    "class": "device-connector",
+    "key": "queclink-quickstart-ascii",
+    "version": "3",
+    "vendor": "Queclink",
     "leftImg": "/solutions/icons/queclink-logo.png",
     "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Queclink Decoder",
-    "import": "/solutions/queclink_decoder.json",
-    "desc": "Enable Queclink devices to connect via UDP.",
-    "prereqs": [
-      "Queclink device"
-    ],
+    "title": "Queclink ASCII Quickstart",
+    "import": "/solutions/queclink_quickstart_ascii.json",
+    "desc": "Enable Queclink devices to connect via UDP using the ASCII protocol.",
+    "details": "/solutions/queclink_quickstart_ascii.md",
     "tags": [
+      "device connector",
       "queclink"
     ]
   },
   {
+    "class": "device-onboarding",
+    "key": "queclink-onboarding",
+    "version": "1",
+    "vendor": "Queclink",
     "leftImg": "/solutions/icons/queclink-logo.png",
     "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Queclink Device Management",
-    "import": "/solutions/queclink_dm.json",
-    "desc": "Manage Queclink devices from IoT Bridge.",
-    "prereqs": [
-      "Queclink device"
-    ],
+    "title": "Onboard Queclink device",
+    "import": "/solutions/queclink_device_ascii.json",
+    "desc": "Onboard a Queclink device by IMEI.",
     "tags": [
       "queclink"
     ]
   },
   {
+    "class": "cloud-connector",
+    "key": "queclink-to-armor",
+    "version": "1",
+    "vendor": "Queclink",
     "leftImg": "/solutions/icons/queclink-logo.png",
-    "rightImg": "/solutions/icons/generic-cloud.png",
-    "title": "Queclink Configuration OTA",
-    "import": "/solutions/queclink_config_ota.json",
-    "desc": "Handle configuration OTA requests via HTTP.",
-    "prereqs": [
-      "Queclink device"
-    ],
-    "tags": [
-      "queclink"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/queclink-logo.png",
-    "rightImg": "/solutions/icons/track.png",
-    "title": "Publish Queclink events to Track",
-    "import": "/solutions/queclink_to_track.json",
-    "desc": "Publish Queclink events to Tartabit Track.",
-    "prereqs": [
-      "Queclink device"
-    ],
+    "rightImg": "/solutions/icons/armor.png",
+    "title": "Queclink to ARMOR Asset Management",
+    "import": "/solutions/queclink_to_armor.json",
+    "desc": "Integrate Queclink devices with ARMOR Asset Management.",
     "tags": [
       "queclink",
-      "track"
+      "armor"
     ]
   }
 ]

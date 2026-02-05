@@ -1,6 +1,12 @@
 {
   "templateDef": [
     {
+      "name": "Generic Event",
+      "key": "generic_event",
+      "desc": "Generic event to watch to send data..",
+      "type": "generic-key"
+    },
+    {
       "name": "HTTP Server",
       "key": "server",
       "desc": "IoT Bridge will POST to this URL.",
@@ -21,11 +27,11 @@
   "triggers": [
     {
       "id": "6727c63fff0b7e01308b1d82",
-      "name": "POST to HTTP Server",
+      "name": "{{.generic_event}} - POST to HTTP Server",
       "type": "script",
       "def": "if(event.endpoint) {\r\n  http.post('http-sender','{{.server}}' + '/' + event.endpoint.key,event.data.data)\r\n} else {\r\n  http.post('http-sender','{{.server}}',event.data.data)\r\n}",
       "filterType": "generic",
-      "filterGeneric": "data"
+      "filterGeneric": "{{.generic_event}}"
     }
   ]
 }

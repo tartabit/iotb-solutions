@@ -1,0 +1,68 @@
+{
+  "templates": [
+    "lwm2m.json",
+    "udp.json",
+    "compact-binary.json",
+    "queclink.json",
+    "stsunlab.json",
+    "globalstar.json",
+    "iridium.json",
+    "viasat.json",
+    "generic.json",
+    "cdp.json",
+    "admin.json"
+  ],
+  "sections": [
+    {
+      "tags": ["device connector"],
+      "logo": "/solutions/icons/iot-bridge-connect-a-device.png"
+    },
+    {
+      "tags": ["lwm2m"],
+      "logo": "/solutions/icons/lwm2m.png"
+    },    {
+      "tags": ["udp", "cloud connector"],
+      "logo": "/solutions/icons/generic-udp.png"
+    },
+    {
+      "tags": ["coap", "cloud connector"],
+      "logo": "/solutions/icons/generic-coap.png"
+    },
+    {
+      "tags": ["compact-binary", "cloud connector"],
+      "logo": "/solutions/icons/generic-compact-binary.png"
+    },
+    {
+      "tags": ["satellite"],
+      "logo": "/solutions/icons/generic-satellite.png"
+    },
+    {
+      "tags": ["cdp"],
+      "logo": "/solutions/icons/generic-sim-mgmt.png"
+    },
+    {
+      "tags": ["admin"],
+      "logo": "/solutions/icons/iot-bridge-admin.png"
+    },
+    {
+      "tags": ["globalstar", "cloud connector"],
+      "logo": "/solutions/icons/globalstar.png"
+    },
+    {
+      "tags": ["iridium", "cloud connector"],
+      "logo": "/solutions/icons/iridium-logo.png"
+    },
+    {
+      "tags": ["queclink", "cloud connector"],
+      "logo": "/solutions/icons/queclink-logo.png"
+    },
+    {
+      "tags": ["st-sunlab", "cloud connector"],
+      "logo": "/solutions/icons/stsunlab-wide.png"
+    },
+    {
+      "tags": ["viasat", "cloud connector"],
+      "logo": "/solutions/icons/viasat.png"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "templateDef": [
+    {
+      "desc": "UDP Port for access, 9130 for shared, or custom.",
+      "key": "port",
+      "name": "UDP Port",
+      "value": "9130"
+    },
+    {
+      "desc": "First Device ID to onboard",
+      "key": "key",
+      "name": "First Device ID",
+      "value": "241xxxxxxx"
+    }
+  ],
+  "endpoints": [
+    {
+      "key": "{{.key}}",
+      "name": "{{.key}}",
+      "serviceId": "697826d712eaad2a010c710a"
+    }
+  ],
+  "reports": [
+    {
+      "fields": [
+        {
+          "hidden": false,
+          "key": "cmd",
+          "name": "Command",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "hidden": false,
+          "key": "sample",
+          "name": "Sample",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "hidden": true,
+          "key": "command",
+          "name": "command",
+          "required": false,
+          "type": "string"
+        }
+      ],
+      "id": "6973a67d766f0c235737e689",
+      "key": "stsunlab-sampler",
+      "name": "ST Sun Lab Message Sampler",
+      "operations": [],
+      "options": {
+        "lookupEndpointsByKey": false
+      },
+      "records": 0
+    }
+  ],
+  "services": [
+    {
+      "id": "6973a633766f0c235737e687",
+      "key": "report",
+      "modelId": "81b90f9f768aa772b6f09ed8",
+      "name": "Report"
+    },
+    {
+      "id": "697c165612eaad2a010c710f",
+      "key": "stsunlab-alerts",
+      "modelId": "818c54314c6469493406e874",
+      "name": "ST SUNLAB - Alerts"
+    },
+    {
+      "id": "697826d712eaad2a010c710a",
+      "key": "stsunlab-ascii-udp",
+      "modelId": "81418d0e1607815e03483843",
+      "name": "ST SUNLAB - ASCII UDP",
+      "params": {
+        "extractor": "custom",
+        "extractor_config": "{\"delim\": \";\", \"index\": 1, \"length\":15, \"path\":\"imei\", \"prefix\": \"\", \"format\":\"stsunlab\"}",
+        "port": "{{.port}}",
+        "send_events": "true"
+      }
+    },
+    {
+      "id": "6978279812eaad2a010c710e",
+      "key": "stsunlab-track",
+      "modelId": "81f51ae0b339efbe51e8cdcb",
+      "name": "ST SUNLAB - Track"
+    }
+  ],
+  "triggers": [
+    {
+      "def": "var rec = {\r\n    name: event.endpoint.name,\r\n    location: {\r\n        lat: event.data.data.gps.lat,\r\n        lon: event.data.data.gps.lon,\r\n    },\r\n    values: {\r\n        rxLevel: event.data.data.rxLevel\r\n    }\r\n}\r\n\r\ntrack.publish('stsunlab-track', event.endpoint.key, event.ts, rec)\r\n",
+      "filterGeneric": "stunlab-data",
+      "filterType": "generic",
+      "id": "6978281165e70e7620d3e18a",
+      "name": "ST SUNLAB - Send to Track",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\nvar firstSep = event.data.payload.indexOf(';')\r\n\r\nvar cmd = event.data.payload.substring(0, firstSep)\r\n\r\nreport.publish('stsunlab-sampler',cmd,event.ts,{values:{command: cmd, sample: event.data.payload}})\r\n",
+      "filterType": "udp-receive",
+      "filterServiceId": "697826d712eaad2a010c710a",
+      "id": "6973a60fdbadb1f4673f8c58",
+      "name": "ST SUNLAB - Message Sampler",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\nif (!event.endpoint.statusDetails) {\r\n    event.endpoint.statusDetails = {}\r\n}\r\n\r\nvar parts = event.data.payload.split(';')\r\nparts = parts.reverse()\r\n\r\nvar cmd = parts.pop()\r\nvar deviceId = parts.pop()\r\nvar reportMask = convert.hexToInt(parts.pop())\r\n\r\nfunction setDesc() {\r\n    var descriptions = {\r\n        ALT: 'alert',\r\n        STT: 'status'\r\n    };\r\n    if (!descriptions[cmd]) {\r\n        log.warn('no description for [' + cmd + ']')\r\n    }\r\n    obj.desc = descriptions[cmd] || cmd;\r\n}\r\n\r\nfunction reportHasBit(bit) {\r\n    if ((reportMask & (1 << bit)) == 1 << bit) return true\r\n    return false\r\n}\r\n\r\nvar obj = {}\r\n\r\nsetDesc()\r\nobj.cmd = cmd\r\nobj.raw = event.data.payload\r\nobj.remoteAddr = event.data.remoteAddr\r\nobj.ts = event.ts\r\n\r\nvar details = {}\r\nvar addTags = {\r\n    //type: decoders[ver]['DeviceType']\r\n}\r\nvar delTags = []\r\nvar updateNeeded = false\r\n\r\n// STT;2410000010;39FFFF;241;1.0.18;1;20260121;12:12:34;0034170A;450;8;0006;61;+37.479286;+126.887831;0.07;0.00;10;1;1;1;3541;4.0;96;17056;101435\r\n// ALT;2410000010;39FFFF;241;1.0.18;0;20260121;04:40:24;0034170A;450;8;0006;61;+37.479306;+126.887834;0.20;333.64;9;1;20;;;4.0;98;16604;101435\r\n\r\n// MODEL\r\nif (reportHasBit(1)) {\r\n    var model = convert.hexToInt(parts.pop())\r\n\r\n    var models = {\r\n        \"1\": \"ST300RI\",\r\n        \"2\": \"ST340\",\r\n        \"3\": \"ST340LC\",\r\n        \"4\": \"ST340HRI\",\r\n        \"5\": \"ST350\",\r\n        \"6\": \"ST480\",\r\n        \"7\": \"ST300A\",\r\n        \"8\": \"ST300R\",\r\n        \"9\": \"ST300B\",\r\n        \"10\": \"ST300V\",\r\n        \"11\": \"ST300C\",\r\n        \"12\": \"ST300K\",\r\n        \"13\": \"ST300P\",\r\n        \"14\": \"ST300F\",\r\n        \"15\": \"ST510\",\r\n        \"16\": \"ST300D\",\r\n        \"17\": \"ST340R\",\r\n        \"18\": \"ST390\",\r\n        \"20\": \"ST600R\",\r\n        \"21\": \"ST600V\",\r\n        \"22\": \"ST630\",\r\n        \"23\": \"ST640\",\r\n        \"24\": \"ST650\",\r\n        \"26\": \"STU600R\",\r\n        \"27\": \"STU600V\",\r\n        \"28\": \"STU630\",\r\n        \"29\": \"ST690\",\r\n        \"30\": \"STU690\",\r\n        \"31\": \"STU650\",\r\n        \"32\": \"STE650\",\r\n        \"33\": \"ST640LC\",\r\n        \"34\": \"ST600M\",\r\n        \"35\": \"ST600MD\",\r\n        \"36\": \"ST4300\",\r\n        \"37\": \"ST3940\",\r\n        \"38\": \"ST3940B\",\r\n        \"39\": \"ST449\",\r\n        \"40\": \"ST310U\",\r\n        \"41\": \"ST419\",\r\n        \"42\": \"ST360\",\r\n        \"43\": \"ST489\",\r\n        \"44\": \"ST340U\",\r\n        \"45\": \"ST340UR\",\r\n        \"46\": \"ST4500\",\r\n        \"47\": \"ST4340\",\r\n        \"48\": \"ST4340H\",\r\n        \"49\": \"ST4340R\",\r\n        \"50\": \"ST4310P\",\r\n        \"51\": \"사용 금지\",\r\n        \"52\": \"ST4340LC\",\r\n        \"53\": \"ST25T\",\r\n        \"54\": \"ST3300\",\r\n        \"55\": \"ST3340\",\r\n        \"56\": \"ST3340LC\",\r\n        \"57\": \"ST3340R\",\r\n        \"58\": \"ST3300R\",\r\n        \"59\": \"ST4940 Sprint(SU)\",\r\n        \"60\": \"ST4940 Verizon (SU)\",\r\n        \"61\": \"ST4940 AT&T(SU)\",\r\n        \"62\": \"ST4940B Sprint(SU)\",\r\n        \"63\": \"ST4940B Verizon (SU)\",\r\n        \"64\": \"ST4940B AT&T(SU)\",\r\n        \"65\": \"ST3300RE\",\r\n        \"66\": \"ST3500\",\r\n        \"67\": \"ST4310U\",\r\n        \"68\": \"ST4310\",\r\n        \"69\": \"ST4310W\",\r\n        \"70\": \"ST4310R\",\r\n        \"71\": \"ST4310S\",\r\n        \"72\": \"ST4310M\",\r\n        \"73\": \"ST4500DO\",\r\n        \"74\": \"ST3310U\",\r\n        \"75\": \"ST4330\",\r\n        \"76\": \"ST3330\",\r\n        \"77\": \"ST20U\",\r\n        \"78\": \"ST730P\",\r\n        \"79\": \"ST4940BT AT&T\",\r\n        \"80\": \"ST4940T AT&T\",\r\n        \"81\": \"ST3300RP\",\r\n        \"82\": \"ST4500T\",\r\n        \"83\": \"ST20A\",\r\n        \"84\": \"ST4315U\",\r\n        \"85\": \"ST4315R\",\r\n        \"86\": \"ST4315W\",\r\n        \"87\": \"ST4315RW\",\r\n        \"88\": \"ST20UC\",\r\n        \"89\": \"ST3310\",\r\n        \"90\": \"ST3310RST\",\r\n        \"91\": \"ST3310W\",\r\n        \"92\": \"ST3310RW\",\r\n        \"93\": \"ST3310M\",\r\n        \"94\": \"ST4910\",\r\n        \"95\": \"ST4315\",\r\n        \"96\": \"ST4315M\",\r\n        \"97\": \"ST3310R\",\r\n        \"98\": \"ST4330E\",\r\n        \"99\": \"ST3330E\",\r\n        \"100\": \"ST4500J\",\r\n        \"101\": \"ST4910\",\r\n        \"102\": \"ST4910B\",\r\n        \"103\": \"ST4950\",\r\n        \"104\": \"ST4950B\",\r\n        \"105\": \"ST4300T\",\r\n        \"106\": \"ST3310P\",\r\n        \"107\": \"ST4940BT Verizon\",\r\n        \"108\": \"ST4940BT Sprint\",\r\n        \"109\": \"ST4940T Verizon\",\r\n        \"110\": \"ST4940T Sprint\",\r\n        \"111\": \"ST3500DO\",\r\n        \"112\": \"ST4330EE\",\r\n        \"113\": \"ST3330EE\",\r\n        \"114\": \"ST4340LB\",\r\n        \"115\": \"ST4500A\",\r\n        \"116\": \"ST4910(512KB)\",\r\n        \"117\": \"ST4950(512KB)\",\r\n        \"118\": \"ST4950DS\",\r\n        \"119\": \"ST4950BDS\",\r\n        \"120\": \"ST4340B\",\r\n        \"121\": \"ST4310B\",\r\n        \"122\": \"ST4210\",\r\n        \"123\": \"ST3300V\",\r\n        \"124\": \"ST395\",\r\n        \"125\": \"ST25TPM\",\r\n        \"126\": \"ST730C\",\r\n        \"127\": \"ST3500J\",\r\n        \"128\": \"ST4300E\",\r\n        \"129\": \"ST20AD\",\r\n        \"130\": \"ST4330A\",\r\n        \"131\": \"ST4330AE\",\r\n        \"132\": \"ST3330A\",\r\n        \"133\": \"ST4330AEE\",\r\n        \"134\": \"ST4345\",\r\n        \"135\": \"ST3300E\",\r\n        \"136\": \"ST4915B\",\r\n        \"137\": \"ST4955B\",\r\n        \"138\": \"ST4345LC\",\r\n        \"139\": \"ST4345R\",\r\n        \"140\": \"ST4335EE\",\r\n        \"141\": \"ST4335\",\r\n        \"142\": \"ST4335E\",\r\n        \"143\": \"ST4955BDS\",\r\n        \"144\": \"ST310UC\",\r\n        \"145\": \"ST310UC2\",\r\n        \"146\": \"ST4250\",\r\n        \"147\": \"ST4290(M3)\",\r\n        \"148\": \"ST4345LB\",\r\n        \"149\": \"ST4955\",\r\n        \"150\": \"ST4955DS\",\r\n        \"151\": \"ST3500T\",\r\n        \"152\": \"ST3500DOT\",\r\n        \"153\": \"ST3330AE\",\r\n        \"154\": \"ST4335A\",\r\n        \"155\": \"ST4335AE\",\r\n        \"156\": \"ST4505\",\r\n        \"157\": \"ST4505T\",\r\n        \"158\": \"ST4915\",\r\n        \"159\": \"ST4505DO\",\r\n        \"160\": \"ST4215\",\r\n        \"161\": \"ST4305\",\r\n        \"162\": \"ST340US\",\r\n        \"163\": \"ST4211\",\r\n        \"164\": \"ST4211U\",\r\n        \"165\": \"ST7950\",\r\n        \"166\": \"ST4945\",\r\n        \"167\": \"ST4945B\",\r\n        \"168\": \"ST4290(M1)\",\r\n        \"169\": \"ST4290L(M1)\",\r\n        \"170\": \"ST8300\",\r\n        \"171\": \"ST4305R\",\r\n        \"172\": \"ST4305RE\",\r\n        \"173\": \"ST4305E\",\r\n        \"176\": \"ST6300\",\r\n        \"177\": \"ST4945S\",\r\n        \"178\": \"ST4955LCB\",\r\n        \"179\": \"ST4419\",\r\n        \"180\": \"ST4419G\",\r\n        \"181\": \"ST4419GC\",\r\n        \"182\": \"ST410M\",\r\n        \"183\": \"ST410MG\",\r\n        \"184\": \"ST410MGC\",\r\n        \"185\": \"ST4290(M3+Motion)\",\r\n        \"186\": \"ST4290L(M3)\",\r\n        \"187\": \"ST4290L(M3+Motion)\",\r\n        \"188\": \"ST8300R\",\r\n        \"189\": \"ST8300RE\",\r\n        \"190\": \"ST4410\",\r\n        \"191\": \"ST4215U\",\r\n        \"192\": \"ST3330A(MM32)\",\r\n        \"193\": \"ST4335(MM32)\",\r\n        \"194\": \"ST4335A(MM32)\",\r\n        \"195\": \"ST4335EE(MM32)\",\r\n        \"196\": \"ST8310\",\r\n        \"197\": \"ST8310U\",\r\n        \"198\": \"ST4335AE(MM32)\",\r\n        \"199\": \"ST6560\",\r\n        \"200\": \"ST4215UA\",\r\n        \"201\": \"ST4410G\",\r\n        \"202\": \"ST4955LCBW\",\r\n        \"203\": \"ST8300V\",\r\n        \"204\": \"ST8300RP\",\r\n        \"205\": \"ST4215UA-M1\",\r\n        \"206\": \"ST20C\",\r\n        \"207\": \"ST4345R4\",\r\n        \"208\": \"ST310UM\",\r\n        \"209\": \"ST4930\",\r\n        \"210\": \"ST4932\",\r\n        \"211\": \"ST4505TE\",\r\n        \"212\": \"ST8300E\",\r\n        \"213\": \"ST310ULC\",\r\n        \"214\": \"ST4915LCBF\",\r\n        \"215\": \"ST8395\",\r\n        \"216\": \"ST8419\",\r\n        \"217\": \"ST8300T\",\r\n        \"218\": \"ST8310UM\",\r\n        \"219\": \"ST8300H\",\r\n        \"220\": \"ST8310W\",\r\n        \"221\": \"ST25\",\r\n        \"222\": \"ST8310R\",\r\n        \"223\": \"ST8940\",\r\n        \"224\": \"ST4280\",\r\n        \"225\": \"ST4282\",\r\n        \"226\": \"ST8419G\",\r\n        \"227\": \"ST8449\",\r\n        \"228\": \"ST8449G\",\r\n        \"229\": \"ST8210\",\r\n        \"230\": \"ST4315B\",\r\n        \"231\": \"ST9730\",\r\n        \"232\": \"ST43\",\r\n        \"233\": \"ST93\",\r\n        \"234\": \"ST4230\",\r\n        \"235\": \"SD8000\",\r\n        \"236\": \"ST4335E(MM32)\",\r\n        \"237\": \"ST8380\",\r\n        \"238\": \"ST4345FN\",\r\n        \"239\": \"ST8395M\",\r\n        \"240\": \"ST8210P\",\r\n        \"241\": \"ST6952\",\r\n        \"242\": \"ST8230\",\r\n        \"243\": \"ST8230V\",\r\n        \"244\": \"ST8410\",\r\n        \"245\": \"ST9730B\",\r\n        \"246\": \"ST4315BN\",\r\n        \"247\": \"ST4345U\",\r\n        \"248\": \"SD8000U\"\r\n    }\r\n\r\n    if (model == 255) {\r\n        var modelNum = deviceId.substring(0, 3)\r\n        var modelStr = models[modelNum]\r\n        if (!modelStr) {\r\n            modelStr = 'unknown-' + modelNum\r\n        }\r\n        obj.model = modelStr\r\n    } else {\r\n        var modelStr = models[model.toString()]\r\n        if (!modelStr) {\r\n            modelStr = 'unknown-' + model.toString()\r\n        }\r\n        obj.model = modelStr\r\n    }\r\n}\r\n\r\n// SW_VER\r\nif (reportHasBit(2)) {\r\n    obj.swVersion = parts.pop()\r\n    addTags['swVersion'] = obj.swVersion\r\n}\r\n\r\n// MSG_TYPE\r\nif (reportHasBit(3)) {\r\n    obj.msgType = parts.pop() === '1' ? 'realtime' : 'storage'\r\n}\r\n\r\n// DATE & TIME\r\nvar hasDate = reportHasBit(4)\r\nvar hasTime = reportHasBit(5)\r\nif (hasDate && hasTime) {\r\n    obj.ts = date.parse(parts.pop() + 'T' + parts.pop() + 'Z', '20060102T15:04:05Z')\r\n} else if (hasDate && !hasTime) {\r\n    obj.ts = date.parse(parts.pop() + 'T00:00:00Z', 'iso8601')\r\n} else {\r\n    log.warn('packets with time and no date use event timestamp')\r\n}\r\n\r\n// CELL_ID\r\nif (reportHasBit(6)) {\r\n    if (!obj.net) {\r\n        obj.net = {}\r\n    }\r\n    obj.net.cellId = parts.pop()\r\n}\r\n\r\n// MCC\r\nif (reportHasBit(7)) {\r\n    if (!obj.net) {\r\n        obj.net = {}\r\n    }\r\n    obj.net.mcc = parts.pop()\r\n}\r\n\r\n// MNC\r\nif (reportHasBit(8)) {\r\n    if (!obj.net) {\r\n        obj.net = {}\r\n    }\r\n    obj.net.mnc = parts.pop()\r\n}\r\n\r\n// LAC\r\nif (reportHasBit(9)) {\r\n    if (!obj.net) {\r\n        obj.net = {}\r\n    }\r\n    obj.net.lac = parts.pop()\r\n}\r\n\r\n// RX_LVL\r\nif (reportHasBit(10)) {\r\n    function rxLevelToDbm(rxLevel) {\r\n\r\n        if (rxLevel === 0) return -105;\r\n        if (rxLevel === 65) return -40;\r\n\r\n        // Levels 1..64 → 2 dB bins\r\n        return -104 + rxLevel;\r\n    }\r\n\r\n    obj.rxLevel = rxLevelToDbm(+parts.pop())\r\n    if (event.endpoint.statusDetails.rxLevel != obj.rxLevel) {\r\n        details['rxLevel'] = obj.rxLevel\r\n    }\r\n}\r\n\r\n// LAT\r\nif (reportHasBit(11)) {\r\n    if (!obj.gps) {\r\n        obj.gps = {}\r\n    }\r\n    var temp = parts.pop()\r\n    if (temp[0] == '+') {\r\n        obj.gps.lat = +temp.substring(1)\r\n    } else {\r\n        obj.gps.lat = +temp\r\n    }\r\n}\r\n\r\n// LON\r\nif (reportHasBit(12)) {\r\n    if (!obj.gps) {\r\n        obj.gps = {}\r\n    }\r\n    var temp = parts.pop()\r\n    if (temp[0] == '+') {\r\n        obj.gps.lon = +temp.substring(1)\r\n    } else {\r\n        obj.gps.lon = +temp\r\n    }\r\n}\r\n\r\n// SPD\r\nif (reportHasBit(13)) {\r\n    if (!obj.gps) {\r\n        obj.gps = {}\r\n    }\r\n    obj.gps.speed = +parts.pop()\r\n}\r\n\r\n// CRS\r\nif (reportHasBit(14)) {\r\n    if (!obj.gps) {\r\n        obj.gps = {}\r\n    }\r\n    obj.gps.heading = +parts.pop()\r\n}\r\n\r\n// SATT\r\nif (reportHasBit(15)) {\r\n    if (!obj.gps) {\r\n        obj.gps = {}\r\n    }\r\n    obj.gps.satellites = +parts.pop()\r\n}\r\n\r\n// FIX\r\nif (reportHasBit(16)) {\r\n    if (!obj.gps) {\r\n        obj.gps = {}\r\n    }\r\n    switch (parts.pop()) {\r\n        case '1':\r\n            obj.gps.fix = 'fixed'\r\n            break\r\n        case '0':\r\n            obj.gps.fix = 'not-fixed'\r\n            break\r\n        case '3':\r\n            obj.gps.fix = 'dead-reckoning'\r\n            break\r\n        default:\r\n            obj.gps.fix = 'unknown'\r\n    }\r\n}\r\n\r\n// IN_STATE\r\nif (reportHasBit(17)) {\r\n    var temp = parts.pop()\r\n\r\n    function bitToBool(str, bit) {\r\n        if (str[bit] === '1') return true\r\n        return false\r\n    }\r\n\r\n    obj.inputState = {\r\n        ignition: bitToBool(temp, 0),\r\n        in1: bitToBool(temp, 1),\r\n        in2: bitToBool(temp, 2),\r\n        in3: bitToBool(temp, 3),\r\n        in4: bitToBool(temp, 4),\r\n        in5: bitToBool(temp, 5),\r\n        in6: bitToBool(temp, 6),\r\n        in7: bitToBool(temp, 7),\r\n    }\r\n}\r\n\r\n// OUT_STATE\r\nif (reportHasBit(18)) {\r\n    var temp = parts.pop()\r\n\r\n    function bitToBool(str, bit) {\r\n        if (str[bit] === '1') return true\r\n        return false\r\n    }\r\n\r\n    obj.outputState = {\r\n        out1: bitToBool(temp, 0),\r\n        out2: bitToBool(temp, 1),\r\n        out3: bitToBool(temp, 2),\r\n        out4: bitToBool(temp, 3),\r\n        out5: bitToBool(temp, 4),\r\n    }\r\n}\r\n\r\n// MODE\r\nif (reportHasBit(19)) {\r\n    var temp = parts.pop()\r\n    switch (+temp) {\r\n        case 0:\r\n            obj.mode = 'parking'\r\n            break\r\n        case 1:\r\n            obj.mode = 'driving'\r\n            break\r\n        case 2:\r\n            obj.mode = 'idle'\r\n            break\r\n        case 3:\r\n            obj.mode = 'speeding'\r\n            break\r\n        case 4:\r\n            obj.mode = 'towing'\r\n            break\r\n        case 5:\r\n            obj.mode = 'deactivate-zone'\r\n            break\r\n        case 7:\r\n            obj.mode = 'main-power-disconnected'\r\n            break\r\n        case 9:\r\n            obj.mode = 'carry'\r\n            break\r\n        case 11:\r\n            obj.mode = 'emergency-park'\r\n            break\r\n        case 12:\r\n            obj.mode = 'emergency-drive'\r\n            break\r\n        default:\r\n            obj.mode = 'unknown-' + temp\r\n    }\r\n}\r\n\r\n// STT_RPT_TYPE\r\n// TODO HANDLE EMERGENCY MODE\r\nif (reportHasBit(20)) {\r\n    var temp = parts.pop()\r\n    switch (+temp) {\r\n        case 0:\r\n            obj.reportType = 'response'\r\n            break\r\n        case 1:\r\n            obj.mode = 'time'\r\n            break\r\n        case 2:\r\n            obj.mode = 'distance'\r\n            break\r\n        case 3:\r\n            obj.mode = 'angle/heading'\r\n            break\r\n        case 4:\r\n            obj.mode = 'heartbeat'\r\n            break\r\n        default:\r\n            obj.mode = 'unknown-' + temp\r\n    }\r\n}\r\n\r\n// MSG_NUM\r\nif (reportHasBit(21)) {\r\n    obj.msgNum = parts.pop()\r\n}\r\n\r\n// RESERVED\r\nif (reportHasBit(23)) {\r\n    parts.pop()\r\n}\r\n\r\n// ASSIGN_MAP\r\nif (reportHasBit(23)) {\r\n    obj.assignMap = parts.pop()\r\n    var assignMask = convert.hexToInt(obj.assignMap)\r\n    function assignHasBit(bit) {\r\n        if (assignMask & (1 << bit) == 1 << bit) return true\r\n        return false\r\n    }\r\n\r\n\r\n\r\n    if (assignHasBit(1)) {\r\n        obj.backupBatteryVoltage = +parts.pop()\r\n    }\r\n    if (assignHasBit(2)) {\r\n        obj.mainPowerVoltage = +parts.pop()\r\n    }\r\n    if (assignHasBit(3)) {\r\n        obj.temp1 = +parts.pop()\r\n    }\r\n}\r\n\r\nif (obj.net) {\r\n    try {\r\n        var netData = convert.mccmnc(obj.net.mcc, obj.net.mnc)\r\n        if (netData) {\r\n            addTags.country = netData.country\r\n            addTags.operator = netData.operator\r\n        }\r\n    } catch (e) {\r\n        log.warn('no mcc/mnc for ' + obj.net.mcc + '/' + obj.net.mnc)\r\n        if (global.values.stsunlabConfig.alerts) {\r\n            alert.raise('stsunlab-alerts', 'stsunlab-no-mccmnc-' + obj.net.mcc + '-' + obj.net.mnc, 'no mcc/mnc for [' + obj.net.mcc + '][' + obj.net.mnc + ']', 'medium', 'no mcc/mnc for [' + obj.net.mcc + '][' + obj.net.mnc + ']', { tags: { type: 'stsunlab-ascii-protocol' } })\r\n        }\r\n    }\r\n}\r\n\r\n/*\r\nif (obj.iccid) {\r\n    details.iccid = obj.iccid\r\n    updateNeeded = true\r\n}\r\nif (obj.vin) {\r\n    details.vin = obj.vin\r\n    updateNeeded = true\r\n}\r\nif (obj.battery) {\r\n    if (event.endpoint.statusDetails.battery != obj.battery) {\r\n        details.battery = obj.battery\r\n    updateNeeded = true\r\n    }\r\n}\r\n\r\n*/\r\n\r\nif (Object.keys(details).length > 0) endpoint.update(event.endpoint.key, { statusDetails: details })\r\n\r\nendpoint.updateTags(event.endpoint.key, addTags, delTags)\r\n\r\nif (!obj.ts) {\r\n    obj.ts = event.ts\r\n}\r\n\r\nvar repTs = obj.ts\r\nvar evtTs = date.parse(event.ts, 'rfc3339')\r\nobj.age = (evtTs - repTs) / 1000\r\n\r\ndelete obj.temp\r\ndelete obj.ignored\r\n\r\nif (global.values.stsunlabConfig.debug || event.injected) {\r\n    log.trace('[' + event.endpoint.key + '] ' + cmd + ' received [' + obj.msgNum + ']', obj)\r\n}\r\n\r\nif (Object.keys(obj).length != 0) {\r\n    exec.now('stunlab-data', obj)\r\n}\r\n\r\n",
+      "filterType": "udp-receive",
+      "filterServiceId": "697826d712eaad2a010c710a",
+      "id": "6973b75fdbadb1f4673fa7ae",
+      "name": "ST SUNLAB - Decode ASCII",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ]
+}

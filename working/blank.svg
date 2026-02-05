@@ -1,0 +1,12 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Canvas -->
+  <rect width="240" height="240" fill="#FFFFFF"></rect>
+
+  <!-- Soft container -->
+  <circle cx="120" cy="120" r="92" fill="#d0e5f9"></circle>
+
+  <!-- Text positioned like the other icons -->
+  <text x="120" y="185" text-anchor="middle" font-family="Raleway, Arial, sans-serif" font-size="24" font-weight="600" fill="#1F2A44">
+    Administration
+  </text>
+</svg>

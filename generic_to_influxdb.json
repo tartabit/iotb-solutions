@@ -1,6 +1,12 @@
 {
   "templateDef": [
     {
+      "name": "Generic Event",
+      "key": "generic_event",
+      "desc": "Generic event to watch to send data..",
+      "type": "generic-key"
+    },
+    {
       "name": "InfluxDB server",
       "key": "server",
       "desc": "The URL for the influxdb server.",
@@ -36,7 +42,7 @@
     {
       "id": "5f5b9e49dfb509446ef1b741",
       "name": "InfluxDB",
-      "key": "influxdb",
+      "key": "influxdb-connector",
       "modelId": "81f3b4b560a24e692418b239",
       "params": {
         "bucket": "{{.bucket}}",
@@ -48,13 +54,16 @@
   ],
   "triggers": [
     {
-      "id": "5f5b9e4adfb509446ef1b743",
-      "name": "Send to InfluxDB",
-      "version": 2,
-      "type": "script",
-      "def": "influxdb.publish('influxdb', '{{.metric_name}}', {name: event.endpoint.name, key: event.endpoint.key}, event.data.data)",
+      "def": "var obj = convert.flattenObject(event.data.data,'_')\r\n\r\nif (event.endpoint) {\r\n    influxdb.publish('influxdb-connector', '{{.metric_name}}', { name: event.endpoint.name, key: event.endpoint.key }, obj)\r\n} else {\r\n    influxdb.publish('influxdb-connector', '{{.metric_name}}', undefined, obj)\r\n}",
+      "filterGeneric": "{{.generic_event}}",
       "filterType": "generic",
-      "filterGeneric": "data"
+      "id": "697fd094dcf9a23a609f4cff",
+      "name": "Send to InfluxDB",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
     }
   ]
 }

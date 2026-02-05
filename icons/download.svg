@@ -1,0 +1,17 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <rect width="240" height="240" fill="#0A1A2F"></rect>
+  <circle cx="120" cy="120" r="100" fill="#142850"></circle>
+
+  <!-- UDP Packet symbol: simplified network/data -->
+  <line x1="80" y1="90" x2="160" y2="90" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></line>
+  <line x1="80" y1="150" x2="160" y2="150" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"></line>
+  <circle cx="75" cy="90" r="10" fill="#F2AA4C"></circle>
+  <circle cx="75" cy="150" r="10" fill="#F2AA4C"></circle>
+  <circle cx="165" cy="120" r="10" fill="#F2AA4C"></circle>
+
+  <!-- “UDP” label -->
+  <text x="120" y="210" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700" fill="#FFFFFF">
+    UDP
+  </text>
+</svg>

@@ -1,5 +1,8 @@
 [
   {
+    "class": "administration",
+    "key": "admin-daily-account-summary-to-datadog",
+    "version": "1",
     "leftImg": "/solutions/icons/iot-bridge.png",
     "rightImg": "/solutions/icons/generic-email.png",
     "title": "Daily account summary",
@@ -12,6 +15,9 @@
     ]
   },
   {
+    "class": "administration",
+    "key": "admin-events-to-datadog",
+    "version": "1",
     "leftImg": "/solutions/icons/iot-bridge.png",
     "rightImg": "/solutions/icons/datadog.png",
     "title": "Send events to Data Dog logs",

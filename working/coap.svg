@@ -1,0 +1,29 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="240" fill="#FFFFFF"></rect>
+  <circle cx="120" cy="120" r="92" fill="#d0e5f9"></circle>
+
+  <!-- Constrained node -->
+  <rect x="100" y="90" width="40" height="40" rx="8" fill="none" stroke="#1F2A44" stroke-width="4"></rect>
+
+  <!-- Inner red constraint brackets -->
+  <line x1="104" y1="94" x2="116" y2="94" stroke="#ff1f1a" stroke-width="4" stroke-linecap="round"></line>
+  <line x1="104" y1="94" x2="104" y2="106" stroke="#ff1f1a" stroke-width="4" stroke-linecap="round"></line>
+
+  <line x1="136" y1="126" x2="124" y2="126" stroke="#ff1f1a" stroke-width="4" stroke-linecap="round"></line>
+  <line x1="136" y1="126" x2="136" y2="114" stroke="#ff1f1a" stroke-width="4" stroke-linecap="round"></line>
+
+  <!-- Request -->
+  <line x1="60" y1="110" x2="96" y2="110" stroke="#1F2A44" stroke-width="4" stroke-linecap="round"></line>
+  <polygon points="96,110 86,104 86,116" fill="#1F2A44"></polygon>
+  <circle cx="54" cy="110" r="5" fill="#ff1f1a"></circle>
+
+  <!-- Response -->
+  <line x1="144" y1="110" x2="180" y2="110" stroke="#1F2A44" stroke-width="4" stroke-linecap="round"></line>
+  <polygon points="144,110 154,104 154,116" fill="#1F2A44"></polygon>
+  <circle cx="186" cy="110" r="5" fill="#ff1f1a"></circle>
+
+  <!-- Label (inside circle) -->
+  <text x="120" y="185" text-anchor="middle" font-family="Raleway, Arial, sans-serif" font-size="28" font-weight="600" fill="#1F2A44">
+    CoAP
+  </text>
+</svg>

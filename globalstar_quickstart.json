@@ -1,0 +1,76 @@
+{
+  "templateDef": [
+    {
+      "name": "API Username",
+      "key": "api_user",
+      "desc": "An API Username for your Globalstar account.",
+      "value": ""
+    },
+    {
+      "name": "API Password",
+      "key": "api_password",
+      "type": "secret",
+      "desc": "An API Password for your Globalstar account.",
+      "value": ""
+    },
+    {
+      "name": "Customer ID",
+      "key": "customer_id",
+      "desc": "Globalstar Customer ID.",
+      "value": ""
+    }
+  ],
+  "services": [
+    {
+      "id": "691b85012fe0490c82aead48",
+      "key": "globalstar",
+      "modelId": "8190af77970e22c91b8bb29a",
+      "name": "Globalstar",
+      "params": {
+        "allow_devices_in_other_accounts": "false",
+        "api_password": "{{.api_password}}",
+        "api_user": "{{.api_user}}",
+        "customer_id": "{{.customer_id}}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "def": "\r\nvar format = 'text'\r\nif (event.data.data.format) {\r\n    format = event.data.data.format\r\n}\r\n\r\nvar bin = null\r\n\r\nswitch (format) {\r\n    case 'text':\r\n        bin = convert.strToBin(event.data.data.message)\r\n        break\r\n    case 'json':\r\n        bin = convert.strToBin(event.data.data.message)\r\n        break\r\n    case 'hex':\r\n        bin = conver.hexToBin(event.data.data.message)\r\n        break\r\n    default:\r\n        log.warn('invalid format: ' + format + ' message not sent.')\r\n        trigger.exit()\r\n        break\r\n}\r\n\r\nglobalstar.send('globalstar', event.endpoint.key, bin)",
+      "filterGeneric": "globalstar-send-message",
+      "filterType": "generic",
+      "genericSample": "{\n  \"form\": true,\n   \"title\": \"Send Message\",\n   \"desc\": \"Send a MT message to a terminal\",\n   \"icon\": \"mdi-download-box\",\n   \"endpoint\":{ \"required\": true },\n   \"fields\": [\n      { \"name\": \"Message\", \"key\": \"message\", \"type\": \"string\", \"rows\":4},\n      { \"name\": \"Format\", \"key\": \"format\", \"type\": \"option\", \"options\": [ \"text\", \"json\", \"hex\"], \"value\": \"string\" }\n   ]\n}",
+      "id": "691cce89b3fe57d59f63468d",
+      "name": "Globalstar - Send Message",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\nexec.now('globalstar-received', event.data)",
+      "filterServiceId": "691b85012fe0490c82aead48",
+      "filterType": "globalstar-received",
+      "id": "6980151d59204961f49d43ff",
+      "name": "Globalstar - Receive Message",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "exec.now('globalstar-message-sent', event.data)",
+      "filterServiceId": "691b85012fe0490c82aead48",
+      "filterType": "globalstar-sent",
+      "id": "6980154359204961f49d4400",
+      "name": "Globalstar - Message Sent",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ]
+}

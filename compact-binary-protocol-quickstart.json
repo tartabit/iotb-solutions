@@ -1,0 +1,281 @@
+{
+  "services": [
+    {
+      "id": "689cd8cf000d74e17495378d",
+      "key": "compact-udp-server",
+      "modelId": "81418d0e1607815e03483843",
+      "name": "Compact UDP Protocol Server",
+      "params": {
+        "extractor": "custom",
+        "extractor_config": "{\"delim\": \",\", \"index\": 0, \"length\":15, \"path\":\"imei\", \"prefix\": \"\", \"format\":\"compact-binary\"}",
+        "port": "9110",
+        "send_events": "true"
+      }
+    },
+    {
+      "id": "689d3fe1000d74e1749537a5",
+      "key": "compact-udp-track",
+      "modelId": "81f51ae0b339efbe51e8cdcb",
+      "name": "Compact UDP Track"
+    }
+  ],
+  "triggerGlobals": [
+    {
+      "isSecret": false,
+      "key": "initializeDesiredConfig",
+      "value": "false"
+    }
+  ],
+  "triggers": [
+    {
+      "def": "var debug = false\r\n\r\nfunction configGetDesired(ep) {\r\n    var desiredConfig = endpoint.storageGet(ep.key, 'desired-config')\r\n    if (!desiredConfig) {\r\n        if(global.values.initializeDesiredConfig) {\r\n            var latestConfig = endpoint.storageGet(ep.key, 'latest-config')\r\n            if(!latestConfig) {\r\n                return undefined\r\n            }\r\n            desiredConfig = {values: latestConfig.values}\r\n            endpoint.storageSet(ep.key, 'desired-config', desiredConfig)\r\n        } else {\r\n            return undefined\r\n        }\r\n    }\r\n    return desiredConfig\r\n}\r\n\r\nfunction configSetDesired(ep, config) {\r\n    var desiredConfig = configGetDesired(ep)\r\n\r\n    if (!config) return\r\n\r\n    var keys = Object.keys(config)\r\n    keys.forEach(function(key) {\r\n        desiredConfig.values[key] = config[key]\r\n    })\r\n\r\n    endpoint.storageSet(ep.key, 'desired-config', desiredConfig)\r\n}\r\n\r\nfunction configNeeded(ep, desiredConfig, config) {\r\n    if (!desiredConfig) {\r\n        return false\r\n    }\r\n    \r\n    if (!config) {\r\n        config = endpoint.storageGet(ep.key, 'latest-config')\r\n    }\r\n\r\n    if (!config) {\r\n        log.trace('checking if config is needed: yes', {reason: 'no known config'})\r\n        return true\r\n    }\r\n\r\n    var keys = Object.keys(desiredConfig.values)\r\n    var match = true\r\n    keys.forEach(function(key) {\r\n        if(desiredConfig.values[key] !== config.values[key]) {\r\n            match = false\r\n        }\r\n    })\r\n\r\n    if(match) {\r\n        if (event.endpoint.tags.config == 'update-in-progress') {\r\n            log.trace('configuration update complete')\r\n        }\r\n        if (ep.tags.config && ep.tags.config != 'up-to-date') {\r\n            endpoint.updateTags(ep.key, { config: 'up-to-date' }, null)\r\n        }\r\n    } else {\r\n         if (ep.tags.config && ep.tags.config != 'update-needed') {\r\n            endpoint.updateTags(ep.key, { config: 'update-needed' }, null)\r\n            log.trace('configuration update needed')\r\n        }\r\n    }\r\n    return !match\r\n}\r\n",
+      "filterType": "library",
+      "id": "689e35b1680def24ee5f0a86",
+      "name": "Compact UDP Protocol - Library",
+      "type": "script"
+    },
+    {
+      "def": "var sd = {}\r\n\r\nif (event.data.data.accountId) {\r\n    sd.accountId = event.data.data.accountId\r\n}\r\nif (event.data.data.reportingInterval) {\r\n    sd.reportingInterval = '' + event.data.data.reportingInterval\r\n}\r\nif (event.data.data.readingInterval) {\r\n    sd.readingInterval = '' + event.data.data.readingInterval\r\n}\r\nif (event.data.data.server) {\r\n    sd.server = '' + event.data.data.server\r\n}\r\n\r\nendpoint.update(event.endpoint.key, { statusDetails: sd })",
+      "filterGeneric": "configure-account",
+      "filterType": "generic",
+      "genericSample": "{\n  \"form\": true,\n   \"title\": \"Set Account parameters\",\n   \"desc\": \"Set account details\",\n   \"icon\": \"mdi-cog-outline\",\n   \"endpoint\":{ \"required\": true },\n   \"serviceKey\": \"customer_settings\",\n   \"fields\": [\n      { \"name\": \"Server\", \"key\": \"server\", \"type\":\"string\"},\n      { \"name\": \"Reporting Interval\", \"key\": \"reportingInterval\", \"type\":\"string\"},\n      { \"name\": \"Reading Interval\", \"key\": \"readingInterval\", \"type\":\"string\"},\n      { \"name\": \"AccountId\", \"key\": \"accountId\", \"type\":\"string\"}\n   ]\n}",
+      "id": "689d5ec1680def24ee5eed56",
+      "name": "Compact UDP Protocol - Endpoint Action - Set Account Parameters",
+      "type": "script"
+    },
+    {
+      "def": "endpoint.updateTags(event.endpoint.key, { config:'report'},null)",
+      "filterGeneric": "request-config",
+      "filterType": "generic",
+      "genericSample": "{\n  \"form\": true,\n   \"title\": \"Request device configuration\",\n   \"desc\": \"Request device configuration\",\n   \"icon\": \"mdi-cog-outline\",\n   \"endpoint\":{ \"required\": true },\n   \"serviceKey\": \"compact-udp-server\"\n}",
+      "id": "689cd8e5000d74e17495378f",
+      "name": "Compact UDP Protocol - Endpoint Action - Request Config",
+      "type": "script"
+    },
+    {
+      "def": "\r\ntrigger.include('Compact UDP Protocol - Library')\r\n\r\nconfigSetDesired(event.endpoint, event.data.data)\r\n",
+      "filterGeneric": "reconfigure",
+      "filterType": "generic",
+      "genericSample": "{\n  \"form\": true,\n   \"title\": \"Reconfigure device\",\n   \"desc\": \"Reconfigure device\",\n   \"icon\": \"mdi-cog-outline\",\n   \"endpoint\":{ \"required\": true },\n   \"serviceKey\": \"compact-udp-server\",\n   \"fields\": [\n      { \"name\": \"Server\", \"key\": \"server\", \"type\":\"string\"},\n      { \"name\": \"Reporting Interval\", \"key\": \"reportingInterval\", \"type\":\"number\"},\n      { \"name\": \"Reading Interval\", \"key\": \"readingInterval\", \"type\":\"number\"}\n   ]\n}",
+      "id": "689cd8e5000d74e17495378e",
+      "name": "Compact UDP Protocol - Endpoint Action - Reconfigure",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\ntrigger.include('Compact UDP Protocol - Library')\r\n\r\nvar debugDecode = false\r\n\r\nvar reader = new convert.binReader(event.data.payload)\r\n\r\nfunction readVLString(reader) {\r\n    var vlen = reader.readUint8()\r\n    if(vlen==0) return\r\n    return reader.readString(vlen)\r\n}\r\n\r\nfunction writeVLString(writer, str) {\r\n    writer.writeUint8(str.length)\r\n    writer.writeString(str)\r\n}  \r\n\r\nfunction rssiToCategory(rssi) {\r\n  if (rssi >= -65) {\r\n    return \"great\";\r\n  } else if (rssi >= -75) {\r\n    return \"good\";\r\n  } else if (rssi >= -85) {\r\n    return \"fair\";\r\n  } else {\r\n    return \"poor\";\r\n  }\r\n}\r\n\r\nfunction readData(reader, pkt) {\r\n    var dataCount = reader.readUint8()\r\n    for (var i = 0; i < dataCount; i++) {\r\n        var sd = {\r\n            data_type: reader.readUint8(),\r\n            data_version: reader.readUint8(),\r\n            data_length: reader.readUint16()\r\n        }\r\n\r\n        if(debugDecode) log.trace('data field: (t:'+sd.data_type+') (v:'+sd.data_version+') (l:'+sd.data_length+')', reader.status())\r\n\r\n        switch (sd.data_type) {\r\n            case 1:\r\n                var count = reader.readUint8()\r\n                for(var i=0;i<count;i++) {\r\n                    pkt.values[readVLString(reader)] = readVLString(reader)\r\n                }\r\n                break\r\n            case 10:\r\n                var locType = reader.readUint8()\r\n                switch (locType) {\r\n                    case 1: // gnss\r\n                        pkt.loc = {\r\n                            source: 'gnss',\r\n                            lat: reader.readFloat32(),\r\n                            lng: reader.readFloat32()\r\n                        }\r\n                        break\r\n                    case 2: // cell\r\n                        // get cell location\r\n                        var cell = {\r\n                            mcc: +readVLString(reader),\r\n                            mnc: +readVLString(reader),\r\n                            cells: [\r\n                                { lacHex: readVLString(reader), cellIdHex: readVLString(reader), rssi: reader.readInt8() }\r\n                            ]\r\n                        }\r\n                        try {\r\n                            var loc = location.geolocate('cell-location', cell)\r\n                            pkt.loc = {\r\n                                source: 'cell',\r\n                                lat: loc.lat,\r\n                                lng: loc.lon\r\n                            }\r\n                        } catch (e) {\r\n                            log.warn('failed to geolocate device: '+e)\r\n                        }\r\n                        break\r\n\r\n                }\r\n                break\r\n            case 11:\r\n                pkt.values.customer_id = convert.binToHex(reader.readBytes(reader.readUint8()))\r\n                break\r\n            case 20:\r\n                pkt.values.software_version = readVLString(reader)\r\n                pkt.values.modem_ersion = readVLString(reader)\r\n                break\r\n            case 21:\r\n                var mcc = readVLString(reader)\r\n                var mnc = readVLString(reader)\r\n                try {\r\n                    var net = network.decodeMccMnc(mcc, mnc)\r\n                    pkt.values.country = net.country\r\n                    pkt.values.operator = net.operator\r\n                } catch (e) {\r\n                    pkt.values.country = 'unknown'\r\n                    pkt.values.operator = 'unknown'\r\n                }\r\n                pkt.values.radio_tech = readVLString(reader)\r\n                break\r\n            case 22:\r\n                pkt.values.battery = reader.readUint8()\r\n                var rssi = reader.readInt8()\r\n                if (rssi <= 0) {\r\n                    pkt.values.rssi = -113;\r\n                } else if (rssi >= 31) {\r\n                    pkt.values.rssi = -51;\r\n                } else {\r\n                    pkt.values.rssi = (rssi * 2) - 113;\r\n                }\r\n                endpoint.update(event.endpoint.key, {\r\n                    addTags: {\r\n                        signalQuality: rssiToCategory(pkt.values.rssi)\r\n                    },\r\n                    statusDetails: {\r\n                        rssi: pkt.values.rssi,\r\n                        battery: Math.round(pkt.values.battery / 10) * 10,\r\n                    }\r\n                })\r\n                break\r\n            case 100:\r\n                pkt.values.temperature = reader.readUint16() / 10.0\r\n                pkt.values.humidity = reader.readUint16() / 10.0\r\n                pkt.values.illumination = reader.readUint16()\r\n                pkt.values.motion = reader.readBool()\r\n                break\r\n            case 101:\r\n                var first_ts = reader.readUint32() * 1000\r\n                var interval = reader.readUint16()\r\n\r\n                pkt.values.readings = []\r\n                var record_count = reader.readUint8()\r\n                for (var i = 0; i < record_count; i++) {\r\n                    pkt.values.readings.push({ ts: new Date(first_ts + (interval * i * 1000)), temperature: reader.readUint16() / 10.0, humidity: reader.readUint16() / 10.0 })\r\n                }\r\n                break\r\n            case 102:\r\n                pkt.values.steps = reader.readUint32()\r\n                break\r\n            default:\r\n        }\r\n        var addTags = {}\r\n        var statusDetails = {}\r\n        if (pkt.values.rssi) {\r\n            addTags.signalQuality = rssiToCategory(pkt.values.rssi)\r\n            statusDetails.rssi = pkt.values.rssi\r\n        }\r\n        if (pkt.values.battery) {\r\n            statusDetails.battery = Math.round(pkt.values.battery / 10) * 10\r\n        }\r\n        endpoint.update(event.endpoint.key, {\r\n            addTags: addTags,\r\n            statusDetails: statusDetails\r\n        })\r\n    }\r\n}\r\n\r\nvar desiredConfig = configGetDesired(event.endpoint)\r\nvar requestConfig = false\r\n\r\nvar pkt = {\r\n    ver: reader.readUint8(),\r\n    cmd: reader.readString(2),\r\n    txnId: reader.readUint16(),\r\n    imei: convert.binToHex(reader.readBytes(reader.readUint8())),\r\n    ts: new Date(reader.readUint32() * 1000),\r\n    values: {},\r\n}\r\n\r\n\r\nif (pkt.imei[0] == '0') {\r\n    pkt.imei = pkt.imei.substring(1)\r\n}\r\n\r\nif(debugDecode) log.trace('header decoded', pkt)\r\n\r\nreadData(reader, pkt)\r\n\r\nif(debugDecode) log.trace('data decoded', pkt)\r\n\r\nswitch (pkt.cmd) {\r\n    case 'T':\r\n        pkt.desc = 'telemetry'\r\n        requestConfig = configNeeded(event.endpoint, desiredConfig, undefined)\r\n        break\r\n    case 'M+':\r\n        pkt.desc = 'motion-start'\r\n        requestConfig = configNeeded(event.endpoint, desiredConfig, undefined)\r\n        break\r\n    case 'M-':\r\n        pkt.desc = 'motion-stop'\r\n        requestConfig = configNeeded(event.endpoint, desiredConfig, undefined)\r\n        break\r\n    case 'C':\r\n        pkt.desc = 'config'\r\n        requestConfig = configNeeded(event.endpoint, desiredConfig, pkt)\r\n        break\r\n    case 'P+':\r\n        pkt.desc = 'power-on'\r\n        break\r\n    default:\r\n        pkt.desc = 'unknown'\r\n        break\r\n}\r\n\r\nendpoint.storageSet(event.endpoint.key, 'latest-' + pkt.desc, pkt)\r\n\r\n// send ack\r\nvar writer = convert.binWriter()\r\nwriter.writeUint8(0x01)\r\nif (pkt.desc == 'config' && requestConfig) {\r\n    writer.writeUint8(0x43) // C\r\n    writer.writeUint8(0x57) // W\r\n} else if (requestConfig || event.endpoint.tags.config == 'report') {\r\n    // request configuration from device\r\n    writer.writeUint8(0x43) // C\r\n    writer.writeUint8(0x52) // R\r\n} else {\r\n    // simple ack, no further action needed\r\n    writer.writeUint8(0x41) // A\r\n    writer.writeUint8(0x00)\r\n}\r\n\r\nwriter.writeUint16(pkt.txnId)\r\nif (pkt.desc == 'config' && requestConfig) {\r\n    var keys = Object.keys(desiredConfig.values)\r\n    var configWriter = convert.binWriter()\r\n    var count = keys.length\r\n    configWriter.writeUint8(count)\r\n    log.trace('writing config', desiredConfig)\r\n    for(var i = 0;i<count;i++) {\r\n        writeVLString(configWriter,keys[i])\r\n        writeVLString(configWriter,desiredConfig.values[keys[i]])\r\n    }\r\n    writer.writeUint8(1) // number of data elements\r\n    writer.writeUint8(1) // data type\r\n    writer.writeUint8(1) // data version\r\n\r\n    var configBytes = configWriter.getBytes()\r\n    writer.writeUint16(configBytes.length)\r\n    writer.writeBytes(configBytes)\r\n    \r\n    endpoint.updateTags(event.endpoint.key, { config: 'update-in-progress' }, null)\r\n    log.trace('sent configuration update', desiredConfig)\r\n}\r\n\r\nudp.send(event.service.key, event.data.remoteAddr, writer.getBytes())\r\n\r\nexec.now('compact-binary-decoded', pkt)\r\n\r\n",
+      "filterServiceId": "689cd8cf000d74e17495378d",
+      "filterType": "udp-receive",
+      "id": "689cd8e5000d74e174953794",
+      "name": "Compact UDP Protocol - Decode",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    },
+    {
+      "def": "\r\n\r\nvar rec = {\r\n    name: event.endpoint.name,\r\n    values: {}\r\n}\r\n\r\nif (event.data.data.desc == 'telemetry') {\r\n    rec.location = {\r\n        lat: event.data.data.loc.lat,\r\n        lon: event.data.data.loc.lng,\r\n    },\r\n    rec.values.battery = event.data.data.values.battery\r\n    rec.values.temp = event.data.data.values.temp\r\n    rec.values.rssi = event.data.data.values.rssi\r\n\r\n    if (event.data.data.values.readings) {\r\n        event.data.data.values.readings.forEach(function (r) {\r\n            var reading = {\r\n                values: {\r\n                    temperature: (r.temperature * 3.0 / 2.0) + 32,\r\n                    humidity: r.humidity\r\n                }\r\n            }\r\n            track.publish('track', event.endpoint.key, r.ts, reading)\r\n        })\r\n    }\r\n\r\n} else if (event.data.data.desc == 'config') {\r\n    rec.values.server = event.data.data.values.server\r\n    rec.values.reportingInterval = event.data.data.values.reportingInterval\r\n    rec.values.readingInterval = event.data.data.values.readingInterval\r\n}\r\ntrack.publish('compact-udp-track', event.endpoint.key, event.ts, rec)\r\n",
+      "filterGeneric": "compact-binary-decoded",
+      "filterType": "generic",
+      "id": "689cd8e5000d74e174953793",
+      "name": "Compact UDP Protocol - Send to Track",
+      "type": "script"
+    }
+  ],
+  "dashboards": [
+    {
+      "id": "68a3293a000d74e1749537cb",
+      "name": "Device Overview",
+      "scope": "account",
+      "view": {
+        "layout": [
+          {
+            "h": 3,
+            "i": "widget-1755523293306",
+            "moved": false,
+            "static": false,
+            "w": 4,
+            "x": 0,
+            "y": 0
+          },
+          {
+            "h": 3,
+            "i": "widget-1755523293306-copy",
+            "moved": false,
+            "static": false,
+            "w": 4,
+            "x": 4,
+            "y": 0
+          },
+          {
+            "h": 3,
+            "i": "widget-1755523293306-copy-copy",
+            "moved": false,
+            "static": false,
+            "w": 4,
+            "x": 4,
+            "y": 6
+          },
+          {
+            "h": 3,
+            "i": "widget-1755523293306-copy-copy-copy",
+            "moved": false,
+            "static": false,
+            "w": 4,
+            "x": 0,
+            "y": 6
+          },
+          {
+            "h": 6,
+            "i": "widget-1755523394373",
+            "moved": false,
+            "static": false,
+            "w": 4,
+            "x": 8,
+            "y": 0
+          },
+          {
+            "h": 3,
+            "i": "widget-1755524262521",
+            "moved": false,
+            "static": false,
+            "w": 4,
+            "x": 0,
+            "y": 3
+          },
+          {
+            "h": 3,
+            "i": "widget-1755524358986",
+            "moved": false,
+            "static": false,
+            "w": 4,
+            "x": 4,
+            "y": 3
+          }
+        ]
+      },
+      "widgets": {
+        "widget-1755523293306": {
+          "config": {
+            "chartType": "pie",
+            "field": "tags.customer",
+            "fieldType": "string",
+            "query": "",
+            "ranges": [],
+            "showUnknown": false,
+            "tags": [],
+            "title": "Devices by Customer"
+          },
+          "id": "widget-1755523293306",
+          "type": "endpoint-fields"
+        },
+        "widget-1755523293306-copy": {
+          "config": {
+            "chartType": "pie",
+            "field": "tags.radioTech",
+            "fieldType": "string",
+            "query": "",
+            "ranges": [],
+            "showUnknown": false,
+            "tags": [],
+            "title": "Devices by Ratio Technology"
+          },
+          "id": "widget-1755523316025",
+          "type": "endpoint-fields"
+        },
+        "widget-1755523293306-copy-copy": {
+          "config": {
+            "chartType": "pie",
+            "field": "tags.verModem",
+            "fieldType": "string",
+            "query": "",
+            "ranges": [],
+            "showUnknown": false,
+            "tags": [],
+            "title": "Devices by Modem Version"
+          },
+          "id": "widget-1755523330658",
+          "type": "endpoint-fields"
+        },
+        "widget-1755523293306-copy-copy-copy": {
+          "config": {
+            "chartType": "pie",
+            "field": "tags.verSoftware",
+            "fieldType": "string",
+            "query": "",
+            "ranges": [],
+            "showUnknown": false,
+            "tags": [],
+            "title": "Devices by Software Version"
+          },
+          "id": "widget-1755523361386",
+          "type": "endpoint-fields"
+        },
+        "widget-1755523394373": {
+          "config": {
+            "clusterMode": "none",
+            "limit": 200,
+            "precision": 3,
+            "query": "",
+            "title": "Device Locations"
+          },
+          "id": "widget-1755523394373",
+          "type": "track-map"
+        },
+        "widget-1755524262521": {
+          "config": {
+            "chartType": "pie",
+            "field": "statusDetails.battery",
+            "fieldType": "number",
+            "query": "serviceId==\"689cd8cf000d74e17495378d\"",
+            "ranges": [
+              {
+                "label": "low",
+                "max": "25",
+                "min": 0
+              },
+              {
+                "label": "fair",
+                "max": "50",
+                "min": "25"
+              },
+              {
+                "label": "good",
+                "max": "75",
+                "min": "50"
+              },
+              {
+                "label": "great",
+                "max": "101",
+                "min": "75"
+              }
+            ],
+            "showUnknown": false,
+            "tags": [],
+            "title": "Device Battery Levels"
+          },
+          "id": "widget-1755524262521",
+          "type": "endpoint-fields"
+        },
+        "widget-1755524358986": {
+          "config": {
+            "chartType": "pie",
+            "field": "tags.signalQuality",
+            "fieldType": "string",
+            "query": "",
+            "ranges": [],
+            "showUnknown": false,
+            "tags": [],
+            "title": "Devices by RSSI"
+          },
+          "id": "widget-1755524358986",
+          "type": "endpoint-fields"
+        }
+      }
+    }
+  ]
+}

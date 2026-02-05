@@ -1,46 +1,18 @@
 [
   {
+    "class": "device-connector",
+    "key": "iridium-quickstart",
+    "version": "1",
+    "vendor": "Iridium",
     "leftImg": "/solutions/icons/iridium-logo.png",
     "rightImg": "/solutions/icons/iot-bridge.png",
-    "title": "Iridium CloudConnect quickstart",
+    "title": "Iridium CloudConnect Quickstart",
     "import": "/solutions/iridium_quickstart.json",
-    "desc": "Quickstart to conenct to Iridium CloudConnect.",
-    "prereqs": [
-      "Iridium CloudConnect account with SQS access"
-    ],
-    "tags": [
-      "iridium"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/iridium-logo.png",
-    "rightImg": "/solutions/icons/track.png",
-    "title": "Publish Iridium messages to Track",
-    "import": "/solutions/iridium_to_track.json",
-    "desc": "Publish Iridium events to Tartabit Track.",
-    "prereqs": [
-      "Import 'Iridium Quickstart' template",
-      "Iridium device"
-    ],
+    "desc": "Quickstart to conenct to Iridium CloudConnect devices.",
     "tags": [
       "iridium",
-      "track"
-    ]
-  },
-  {
-    "leftImg": "/solutions/icons/iridium-logo.png",
-    "rightImg": "/solutions/icons/azure-iot.png",
-    "title": "Iridium to Azure IoT Hub",
-    "import": "/solutions/iridium_to_azure-iot.json",
-    "desc": "Integrate Iridium devices quickly to Azure IoT Hub.",
-    "prereqs": [
-      "Import 'Iridium Quickstart' template",
-      "IoT Hub and service account connection string",
-      "Iridium device"
-    ],
-    "tags": [
-      "iridium",
-      "azure"
+      "satellite",
+      "device connector"
     ]
   }
 ]

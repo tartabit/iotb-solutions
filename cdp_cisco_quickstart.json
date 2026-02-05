@@ -1,0 +1,45 @@
+{
+  "templateDef": [
+    {
+      "name": "Solution Prefix",
+      "key": "prefix",
+      "desc": "Prefix to be prepended on all defined objects.",
+      "genWords": 2
+    },
+    {
+      "name": "API Username",
+      "key": "api_user",
+      "desc": "Cisco ControlCenter API username.",
+      "value": ""
+    },
+    {
+      "name": "API Password",
+      "type": "secret",
+      "key": "api_pass",
+      "desc": "Cisco ControlCenter API password.",
+      "value": ""
+    },
+    {
+      "name": "REST API URL",
+      "type": "string",
+      "key": "rest_api_url",
+      "desc": "Cisco Control Center REST API hostname.",
+      "value": "rws-jpotest.jasper.com"
+    }
+  ],
+  "services": [
+    {
+      "id": "6981683c1ebc2befa397157d",
+      "key": "{{.prefix}}-cisco}}",
+      "modelId": "81557e9b0be095339640dd8c",
+      "name": "Cisco ControlCenter ({{.prefix}})",
+      "params": {
+        "api_key": "{{.api_pass}}",
+        "api_server": "{{.rest_api_url}}",
+        "api_user": "{{.api_user}}",
+        "endpoint_lookup": "none",
+        "target_sync_hour": "8"
+      }
+    }
+  ]
+}

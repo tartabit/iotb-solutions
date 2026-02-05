@@ -1,0 +1,29 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="240" fill="#FFFFFF"></rect>
+  <circle cx="120" cy="120" r="92" fill="#d0e5f9"></circle>
+
+  <!-- Earth -->
+  <circle cx="120" cy="128" r="22" fill="none" stroke="#1F2A44" stroke-width="4"></circle>
+
+  <!-- Earth latitude line -->
+  <line x1="98" y1="128" x2="142" y2="128" stroke="#1F2A44" stroke-width="3" stroke-linecap="round"></line>
+
+  <!-- Satellite body -->
+  <rect x="108" y="56" width="24" height="16" rx="3" fill="none" stroke="#1F2A44" stroke-width="3"></rect>
+
+  <!-- Solar panels -->
+  <rect x="88" y="58" width="18" height="12" rx="2" fill="none" stroke="#1F2A44" stroke-width="3"></rect>
+  <rect x="134" y="58" width="18" height="12" rx="2" fill="none" stroke="#1F2A44" stroke-width="3"></rect>
+
+  <!-- Downlink beams -->
+  <line x1="112" y1="74" x2="104" y2="100" stroke="#ff1f1a" stroke-width="3" stroke-linecap="round"></line>
+  <line x1="128" y1="74" x2="136" y2="100" stroke="#ff1f1a" stroke-width="3" stroke-linecap="round"></line>
+
+  <!-- Uplink hint (small red node on Earth) -->
+  <circle cx="120" cy="106" r="4" fill="#ff1f1a"></circle>
+
+  <!-- Label (inside circle) -->
+  <text x="120" y="185" text-anchor="middle" font-family="Raleway, Arial, sans-serif" font-size="28" font-weight="600" fill="#1F2A44">
+    NTN
+  </text>
+</svg>
