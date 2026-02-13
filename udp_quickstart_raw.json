@@ -1,0 +1,38 @@
+{
+  "templateDef": [
+    {
+      "desc": "UDP Port.",
+      "type": "string",
+      "key": "port",
+      "name": "UDP Port",
+      "value": "9000"
+    }
+  ],
+  "services": [
+    {
+      "id": "697ac420dbfec6246b11b9cc",
+      "key": "udp-receiver-{{.port}}",
+      "modelId": "81418d0e1607815e03483843",
+      "name": "UDP Receiver {{.port}}",
+      "params": {
+        "extractor": "none",
+        "extractor_config": "",
+        "port": "{{.port}}",
+        "send_events": "true"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "def": "// to test, you can use \"nc\" in linux to generate UDP traffic\r\n// example: echo \"pub,{{.key}},23.5,49.2\" | nc -u udp-us.tartabit.com {{.port}}\r\n\r\n// modify this trigger to convert the ascii delimited string to an object for further processing.\r\n// more information about parsing using the ASCII decoder tools: https://docs.tartabit.com/en/Topics/Trigger-ASCII-Parsing\r\nvar obj = convert.delimitedStringToObject(event.data.payload, 'cmd|key|temp|hum', '{{.ascii_delim}}')\r\n\r\n// convert or modify raw data from the device, for example convert from C to F.\r\n// obj.temp = (obj.temp * 4/3) + 32\r\n\r\n// generate a generic event with the decoded data.\r\nexec.now('udp-data', obj)",
+      "filterType": "udp-receive",
+      "id": "697ba44e2a6d27df030d1991",
+      "name": "UDP - Decode raw data",
+      "rateLimit": {
+        "scope": "none",
+        "unit": "minute"
+      },
+      "type": "script"
+    }
+  ]
+}
