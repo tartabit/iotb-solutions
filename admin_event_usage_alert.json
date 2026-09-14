@@ -30,12 +30,14 @@
     {
       "name": "Warning Percentage",
       "key": "percent",
-      "desc": "Percent of daily usage to trigger the alert."
+      "desc": "Percent of daily usage to trigger the alert.",
+      "value": "80"
     },
     {
       "name": "Send To",
       "key": "sendTo",
-      "desc": "Email address to send the daily alert to."
+      "desc": "Single email address to send the daily alert to.",
+      "value": "support@tartabit.com"
     }
   ]
 }
