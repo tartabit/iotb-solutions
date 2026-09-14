@@ -5,6 +5,21 @@
     "version": "1",
     "leftImg": "/solutions/icons/iot-bridge.png",
     "rightImg": "/solutions/icons/generic-email.png",
+    "title": "Daily event usage alerts",
+    "import": "/solutions/admin_event_usage_alert.json",
+    "desc": "Daily usage alerts for administrators.",
+    "prereqs": [
+    ],
+    "tags": [
+      "admin"
+    ]
+  },
+  {
+    "class": "administration",
+    "key": "admin-daily-account-summary-to-datadog",
+    "version": "1",
+    "leftImg": "/solutions/icons/iot-bridge.png",
+    "rightImg": "/solutions/icons/generic-email.png",
     "title": "Daily account summary",
     "import": "/solutions/admin_daily_account_summary.json",
     "desc": "Daily account summary for administrators.",
