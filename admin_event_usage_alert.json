@@ -19,11 +19,24 @@
       "isSecret": false,
       "key": "eventUsageAlertConfig",
       "value": {
-        "percentUsage": 80,
+        "percentUsage": {{.percent}}
+        },
         "sendTo": [
-          "support@tartabit.com"
+          "{{.sendTo}}"
         ]
       }
+    }
+  ],
+  "templateDef": [
+    {
+      "name": "Warning Percentage",
+      "key": "percent",
+      "desc": "Percent of daily usage to trigger the alert."
+    },
+    {
+      "name": "Send To",
+      "key": "sendTo",
+      "desc": "Email address to send the daily alert to."
     }
   ]
 }
