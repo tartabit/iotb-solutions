@@ -19,8 +19,7 @@
       "isSecret": false,
       "key": "eventUsageAlertConfig",
       "value": {
-        "percentUsage": "{{.percent}}"
-        },
+        "percentUsage": "{{.percent}}",
         "sendTo": [
           "{{.sendTo}}"
         ]
